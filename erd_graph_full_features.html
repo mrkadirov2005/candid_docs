@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CANDID — ERD + Modules Map (Full Features)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1218;
+    --bg-2:#161c26;
+    --panel:rgba(18,23,32,.86);
+    --panel-border:rgba(255,255,255,.10);
+    --grid:rgba(255,255,255,.04);
+    --module:#ff8a4c;
+    --entity:#64b5f6;
+    --field:#7bdcb5;
+    --endpoint:#b084f9;
+    --line:rgba(255,255,255,.55);
+    --line-dim:rgba(255,255,255,.18);
+    --text:#e9eef6;
+    --muted:#a7b3c3;
+    --danger:#fb7185;
+    --ok:#34d399;
+    --warn:#fbbf24;
+    --shadow:0 14px 30px rgba(0,0,0,.42);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Space Grotesk",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    overflow:hidden;
+  }
+
+  /* ======= Top UI ======= */
+  .ui{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:50;
+    padding:14px 18px 10px;
+    background:linear-gradient(180deg, rgba(8,10,14,.92) 0%, rgba(8,10,14,.72) 100%);
+    border-bottom:1px solid var(--panel-border);
+    backdrop-filter: blur(10px);
+  }
+  .topbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .title{font-size:18px;font-weight:800;letter-spacing:.3px}
+  .subtitle{margin-top:4px;font-size:12px;color:var(--muted);line-height:1.4}
+  .right{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .input{
+    width:min(520px, 62vw);
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid var(--panel-border);
+    background:rgba(255,255,255,.06);
+    color:var(--text);
+    outline:none;
+  }
+  .input::placeholder{color:rgba(232,237,247,.55)}
+  .btn{
+    border:1px solid var(--panel-border);
+    background:rgba(255,255,255,.06);
+    color:var(--text);
+    padding:9px 12px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .12s ease, background .12s ease, border-color .12s ease;
+    user-select:none;
+  }
+  .btn:hover{background:rgba(255,255,255,.11);transform:translateY(-1px)}
+  .btn.primary{
+    background:#f97316;
+    color:#0b0e14;
+    border-color:transparent;
+  }
+  .btn.danger{
+    background:rgba(251,113,133,.16);
+    border-color:rgba(251,113,133,.40);
+  }
+  .btn.danger:hover{background:rgba(251,113,133,.24)}
+  .seg{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    border:1px solid var(--panel-border);
+    background:rgba(255,255,255,.05);
+    padding:8px 10px;
+    border-radius:14px;
+  }
+  .toggle{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    font-size:12px;
+    color:var(--muted);
+    user-select:none;
+    white-space:nowrap;
+  }
+  .toggle input{accent-color:#f97316}
+  .hint{font-size:12px;color:var(--muted)}
+  .module-rail{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:6px;
+  }
+  .chip{
+    border:1px solid var(--panel-border);
+    background:rgba(255,255,255,.05);
+    color:var(--text);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .12s ease, color .12s ease, transform .12s ease;
+    user-select:none;
+  }
+  .chip:hover{transform:translateY(-1px);background:rgba(255,255,255,.10)}
+  .chip.active{background:#f97316;color:#0b0e14;border-color:transparent}
+  .chip.badge{
+    font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    color:rgba(232,237,247,.85);
+  }
+
+  /* ======= Canvas ======= */
+  .wrapper{
+    position:absolute;
+    inset:0;
+    padding-top:118px;
+    background:
+      radial-gradient(var(--grid) 1px, transparent 1px) 0 0 / 18px 18px,
+      radial-gradient(var(--grid) 1px, transparent 1px) 9px 9px / 18px 18px,
+      linear-gradient(120deg, var(--bg) 0%, #0b0e14 45%, var(--bg-2) 100%);
+  }
+  .viewport{
+    position:absolute;
+    inset:118px 0 0 0;
+    overflow:auto;
+  }
+
+  /* The board is "logical space" (not scaled). We scale an inner layer for zoom. */
+  .board{
+    position:relative;
+    width:4600px;
+    height:2400px;
+    padding:40px 0 0;
+  }
+  .layer{
+    position:absolute;
+    top:0;left:0;
+    transform-origin: 0 0;
+  }
+
+  .box{
+    position:absolute;
+    padding:10px 16px;
+    border-radius:12px;
+    color:#0b0e14;
+    font-weight:700;
+    text-align:center;
+    min-width:190px;
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+    line-height:1.2;
+    border:1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(4px);
+    user-select:none;
+  }
+  .module{
+    background:linear-gradient(140deg, #ffcf8a 0%, var(--module) 60%, #f97316 100%);
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  }
+  .module:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .module.active{outline:2px solid rgba(255,255,255,.25)}
+  .entity{
+    background:linear-gradient(160deg, #b3dcff 0%, var(--entity) 70%);
+    cursor:pointer;
+  }
+  .field{
+    background:linear-gradient(160deg, #c7ffe1 0%, var(--field) 70%);
+    font-size:12px;
+    font-weight:700;
+    min-width:260px;
+    text-align:left;
+    font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  .endpoint{
+    background:linear-gradient(160deg, #e6d0ff 0%, var(--endpoint) 70%);
+    font-size:12px;
+    min-width:320px;
+    text-align:left;
+    font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    cursor:pointer;
+  }
+  .dim{
+    opacity:.18 !important;
+    filter:saturate(.25) brightness(.9);
+    pointer-events:none;
+  }
+  .hidden{display:none !important;}
+
+  /* ======= Wires ======= */
+  svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+  }
+  path.wire{
+    stroke:var(--line);
+    stroke-width:2;
+    fill:none;
+    opacity:.88;
+  }
+  path.wire.dim{stroke:var(--line-dim);opacity:.65}
+  path.wire.hl{stroke-width:3;opacity:1}
+  .legend{
+    position:fixed;
+    right:14px;
+    bottom:12px;
+    z-index:40;
+    border:1px solid var(--panel-border);
+    background:rgba(8,10,14,.72);
+    backdrop-filter: blur(10px);
+    padding:10px 12px;
+    border-radius:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+    max-width:320px;
+  }
+  .legend h3{margin:0 0 8px;font-size:12px;color:rgba(232,237,247,.92);letter-spacing:.2px}
+  .krow{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:12px;margin:6px 0}
+  .dot{width:10px;height:10px;border-radius:999px}
+  .dot.m{background:var(--module)}
+  .dot.e{background:var(--entity)}
+  .dot.f{background:var(--field)}
+  .dot.p{background:var(--endpoint)}
+  .kbd{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    padding:2px 6px;
+    border-radius:8px;
+    color:rgba(232,237,247,.86);
+    font-size:11px;
+  }
+
+  /* Toast */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:16px;
+    transform:translateX(-50%);
+    z-index:60;
+    background:rgba(8,10,14,.86);
+    border:1px solid var(--panel-border);
+    color:rgba(232,237,247,.92);
+    padding:10px 12px;
+    border-radius:14px;
+    box-shadow:0 12px 28px rgba(0,0,0,.35);
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-3px)}
+</style>
+</head>
+<body>
+  <div class="ui">
+    <div class="topbar">
+      <div>
+        <div class="title">CANDID ERD Map</div>
+        <div class="subtitle">
+          Click a <b>module</b> to focus • Click an <b>entity</b> to collapse/expand fields • Click an <b>endpoint</b> to copy •
+          Pan by dragging • Zoom with mouse wheel.
+        </div>
+      </div>
+      <div class="right">
+        <input class="input" id="search" placeholder="Search module/entity/field/endpoint (e.g. portfolio, project, /student/login)" />
+        <button class="btn primary" id="showAllBtn">Show All</button>
+        <button class="btn" id="resetViewBtn">Reset View</button>
+        <div class="seg">
+          <button class="btn" id="zoomOutBtn">−</button>
+          <span class="hint"><span id="zoomLabel">100%</span></span>
+          <button class="btn" id="zoomInBtn">+</button>
+        </div>
+        <div class="seg">
+          <label class="toggle"><input type="checkbox" id="toggleFields" checked />Fields</label>
+          <label class="toggle"><input type="checkbox" id="toggleEndpoints" checked />Endpoints</label>
+          <label class="toggle"><input type="checkbox" id="toggleRels" checked />Relationships</label>
+        </div>
+        <button class="btn" id="exportJsonBtn">Export JSON</button>
+        <button class="btn danger" id="clearSearchBtn">Clear</button>
+      </div>
+    </div>
+    <div class="module-rail" id="moduleRail"></div>
+  </div>
+
+  <div class="wrapper">
+    <div class="viewport" id="viewport">
+      <div class="board" id="board">
+        <div class="layer" id="layer">
+          <svg id="wires"></svg>
+          <!-- boxes injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>Legend & shortcuts</h3>
+    <div class="krow"><span class="dot m"></span> Module <span class="kbd">Click</span> focus</div>
+    <div class="krow"><span class="dot e"></span> Entity <span class="kbd">Click</span> collapse fields</div>
+    <div class="krow"><span class="dot f"></span> Field</div>
+    <div class="krow"><span class="dot p"></span> Endpoint <span class="kbd">Click</span> copy</div>
+    <div class="krow"><span class="kbd">/</span> focus search • <span class="kbd">Esc</span> clear • <span class="kbd">0</span> reset zoom</div>
+  </div>
+
+  <div class="toast" id="toast">Copied</div>
+
+<script>
+/**
+ * FULL-FEATURES ERD MAP
+ * - loads erd.json (same folder) if available; falls back to embeddedErd
+ * - module focus (filters entities + dims others)
+ * - search across modules/entities/fields/endpoints
+ * - zoom + pan (mouse drag) + buttons
+ * - toggles: fields, endpoints, relationships
+ * - click entity to collapse/expand fields
+ * - click endpoint to copy to clipboard
+ * - export JSON
+ */
+
+const embeddedErd = {
+  "entities": {
+    "University": {"id":"uuid","name":"string","admin_id":"uuid","location":"string"},
+    "UniversityAdmin": {"id":"uuid","name":"string","email":"string","password":"string","university_id":"uuid","is_active":"boolean"},
+    "Teacher": {"id":"uuid","name":"string","email":"string","password":"string","university_id":"uuid","is_verified":"boolean","is_active":"boolean"},
+    "Student": {"id":"uuid","name":"string","email":"string","password":"string","university_id":"uuid","admin_id":"uuid","is_verified":"boolean","is_active":"boolean"},
+    "Employer": {"id":"uuid","name":"string","email":"string","company":"string","password":"string","is_active":"boolean"},
+    "Vacancy": {"id":"uuid","type":"enum['internship','job']","description":"string","company":"string","location":"string","mode":"enum['online','offline','hybrid']","salary":"number","is_expired":"boolean","start_date":"date","end_date":"date","employer_id":"uuid"},
+    "Project": {"id":"uuid","title":"string","description":"string","student_id":"uuid","teacher_id":"uuid","university_id":"uuid","is_approved":"boolean","is_active":"boolean"},
+    "Skill": {"id":"uuid","name":"string","type":"string"},
+    "Message": {"id":"uuid","sender_id":"uuid","receiver_id":"uuid","context_type":"enum['student','teacher','project','vacancy','university']","content":"text","attachment_links":"string[]","created_at":"timestamp"}
+  },
+  "relationships": {
+    "University": {"has_many":["UniversityAdmin","Teacher","Student","Project"]},
+    "UniversityAdmin": {"belongs_to":"University"},
+    "Teacher": {"belongs_to":"University","has_many":["Project"]},
+    "Student": {"belongs_to":"University","has_many":["Project"]},
+    "Employer": {"has_many":["Vacancy"]},
+    "Vacancy": {"belongs_to":"Employer","has_many":["Skill"]},
+    "Project": {"belongs_to":["Student","Teacher","University"],"has_many":["Skill","Message"]},
+    "Skill": {"many_to_many":["Project","Vacancy","Student"]},
+    "Message": {"belongs_to":["Student","Teacher","Employer","University"]}
+  },
+  "modules": {
+    "UniversityModule": ["create_university","activate_university","deactivate_university","update_university"],
+    "UniAdminModule": [],
+    "TeacherModule": ["register_teacher","activate_teacher","verify_teacher","update_teacher"],
+    "StudentModule": ["register_student","login_student","activate_student","update_student"],
+    "ProjectModule": ["create_project","update_project","request_verification","verify_project","unverify_project","deactivate_project"],
+    "SkillModule": ["create_skill","assign_skill_to_project","assign_skill_to_student","assign_skill_to_vacancy"],
+    "VacancyModule": ["create_vacancy","activate_vacancy","deactivate_vacancy","update_vacancy"],
+    "MessagingModule": ["send_message","get_messages"],
+    "EmployerModule": ["register_employer","login_employer","activate_employer","update_employer"]
+  },
+  "apiEndpoints": {
+    "university": [{"method":"GET","path":"/university/all"},{"method":"GET","path":"/university"},{"method":"POST","path":"/university"},{"method":"POST","path":"/university/activate"},{"method":"PUT","path":"/university/:id"},{"method":"POST","path":"/university/deactivate"}],
+    "uni_admin": [{"method":"GET","path":"/uni_admin/all"},{"method":"POST","path":"/uni_admin"},{"method":"POST","path":"/uni_admin/activate"},{"method":"PUT","path":"/uni_admin/:id"},{"method":"POST","path":"/uni_admin/deactivate"},{"method":"GET","path":"/uni_admin/uni_all"}],
+    "teacher": [{"method":"GET","path":"/teacher/all"},{"method":"POST","path":"/teacher"},{"method":"POST","path":"/teacher/activate"},{"method":"PUT","path":"/teacher/:id"},{"method":"POST","path":"/teacher/deactivate"},{"method":"GET","path":"/teacher/uni_all"}],
+    "student": [{"method":"POST","path":"/student/register"},{"method":"GET","path":"/student/all"},{"method":"POST","path":"/student"},{"method":"POST","path":"/student/activate"},{"method":"PUT","path":"/student/:id"},{"method":"POST","path":"/student/deactivate"},{"method":"GET","path":"/student/uni_students"},{"method":"POST","path":"/student/login"}],
+    "vacancy": [{"method":"GET","path":"/vacancy/all"},{"method":"GET|POST","path":"/vacancy"},{"method":"POST","path":"/vacancy/activate"},{"method":"PUT","path":"/vacancy/:id"},{"method":"POST","path":"/vacancy/deactivate"}],
+    "messages": [{"method":"GET","path":"/messages/all"},{"method":"GET|POST","path":"/message/university"},{"method":"GET|POST","path":"/message/teacher"},{"method":"GET|POST","path":"/message/student"},{"method":"GET|POST","path":"/message/project"}],
+    "employer": [{"method":"GET","path":"/employer/all"},{"method":"GET|POST","path":"/employer"},{"method":"PUT","path":"/employer"},{"method":"POST","path":"/employer/activate"},{"method":"POST","path":"/employer/deactivate"},{"method":"POST","path":"/employer/login"},{"method":"POST","path":"/employer/register"},{"method":"GET","path":"/employer/profile"}],
+    "project": [{"method":"GET","path":"/project/all"},{"method":"GET|POST","path":"/project"},{"method":"PUT","path":"/project"},{"method":"POST","path":"/project/verify"},{"method":"POST","path":"/project/unverify"},{"method":"POST","path":"/project/request_verify"},{"method":"POST","path":"/project/deactivate"}],
+    "skill": [{"method":"GET","path":"/skill/all"},{"method":"POST","path":"/skill/create"},{"method":"POST","path":"/skill/assign/vacancy"},{"method":"GET","path":"/skill/vacancy"},{"method":"POST","path":"/skill/assign/project"},{"method":"GET","path":"/skill/project"},{"method":"POST","path":"/skill/assign/student"},{"method":"GET","path":"/skill/student"}]
+  },
+  "moduleEntityMap": {"UniversityModule":"University","UniAdminModule":"UniversityAdmin","TeacherModule":"Teacher","StudentModule":"Student","ProjectModule":"Project","SkillModule":"Skill","VacancyModule":"Vacancy","MessagingModule":"Message","EmployerModule":"Employer"}
+};
+
+const moduleEndpointMap = {
+  "UniversityModule":"university","UniAdminModule":"uni_admin","TeacherModule":"teacher","StudentModule":"student",
+  "VacancyModule":"vacancy","MessagingModule":"messages","EmployerModule":"employer","ProjectModule":"project","SkillModule":"skill"
+};
+
+const columnX = { module: 90, entity: 560, field: 1170, endpoint: 1860 };
+const spacing = { module: 120, field: 32, endpoint: 30 };
+const padding = { top: 70, between: 80 };
+
+const els = {
+  viewport: document.getElementById("viewport"),
+  board: document.getElementById("board"),
+  layer: document.getElementById("layer"),
+  wires: document.getElementById("wires"),
+  moduleRail: document.getElementById("moduleRail"),
+  search: document.getElementById("search"),
+  showAllBtn: document.getElementById("showAllBtn"),
+  resetViewBtn: document.getElementById("resetViewBtn"),
+  zoomLabel: document.getElementById("zoomLabel"),
+  zoomInBtn: document.getElementById("zoomInBtn"),
+  zoomOutBtn: document.getElementById("zoomOutBtn"),
+  toggleFields: document.getElementById("toggleFields"),
+  toggleEndpoints: document.getElementById("toggleEndpoints"),
+  toggleRels: document.getElementById("toggleRels"),
+  exportJsonBtn: document.getElementById("exportJsonBtn"),
+  clearSearchBtn: document.getElementById("clearSearchBtn"),
+  toast: document.getElementById("toast")
+};
+
+let erd = embeddedErd;
+const state = {
+  activeModule: null,
+  collapsedEntities: new Set(),
+  zoom: 1,
+  pan: { dragging:false, startX:0, startY:0, scrollLeft:0, scrollTop:0 },
+  show: { fields:true, endpoints:true, rels:true },
+  search: ""
+};
+
+// --- Utility: toast
+let toastTimer = null;
+function toast(msg){
+  els.toast.textContent = msg;
+  els.toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>els.toast.classList.remove("show"), 850);
+}
+
+// --- Create/clear DOM
+function clearLayer(){
+  els.layer.querySelectorAll(".box").forEach(n=>n.remove());
+  while (els.wires.firstChild) els.wires.removeChild(els.wires.firstChild);
+}
+
+// --- Create a node box
+function createBox(id, text, cls, x, y, opts={}){
+  const el = document.createElement("div");
+  el.className = `box ${cls}`;
+  el.id = id;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.textContent = text;
+
+  if (opts.title) el.title = opts.title;
+  if (opts.onClick) el.addEventListener("click", (e)=>{ e.stopPropagation(); opts.onClick(el); });
+  if (opts.onHover) {
+    el.addEventListener("mouseenter", ()=>opts.onHover(true, el));
+    el.addEventListener("mouseleave", ()=>opts.onHover(false, el));
+  }
+  els.layer.appendChild(el);
+  return el;
+}
+
+// --- Positions using offset (stable under transform)
+function centerRight(el){
+  return { x: el.offsetLeft + el.offsetWidth, y: el.offsetTop + el.offsetHeight/2 };
+}
+function centerLeft(el){
+  return { x: el.offsetLeft, y: el.offsetTop + el.offsetHeight/2 };
+}
+
+// --- Draw a wire
+function drawWire(fromEl, toEl, mode="normal"){
+  const a = centerRight(fromEl);
+  const b = centerLeft(toEl);
+  const dx = Math.max(90, (b.x - a.x) * 0.5);
+  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.classList.add("wire");
+  if (mode==="dim") path.classList.add("dim");
+  path.setAttribute("d", `M ${a.x} ${a.y} C ${a.x+dx} ${a.y}, ${b.x-dx} ${b.y}, ${b.x} ${b.y}`);
+  els.wires.appendChild(path);
+  return path;
+}
+
+// --- Data helpers
+function modulesList(){
+  return Object.keys(erd.modules || {});
+}
+function entitiesList(){
+  return Object.keys(erd.entities || {});
+}
+function endpointsForModule(mod){
+  const key = moduleEndpointMap[mod];
+  return (key && erd.apiEndpoints && erd.apiEndpoints[key]) ? erd.apiEndpoints[key] : [];
+}
+function primaryEntityForModule(mod){
+  const mapped = erd.moduleEntityMap ? erd.moduleEntityMap[mod] : null;
+  const guess = mod.replace("Module","");
+  return mapped || (erd.entities && erd.entities[guess] ? guess : null);
+}
+
+// Visible entities based on active module
+function visibleEntities(){
+  if (!state.activeModule) return entitiesList();
+  const primary = primaryEntityForModule(state.activeModule);
+  const vis = new Set();
+  if (primary) {
+    vis.add(primary);
+    const rel = (erd.relationships||{})[primary];
+    if (rel){
+      const targets = [];
+      if (rel.has_many) targets.push(...rel.has_many);
+      if (rel.belongs_to) targets.push(...(Array.isArray(rel.belongs_to)?rel.belongs_to:[rel.belongs_to]));
+      if (rel.many_to_many) targets.push(...rel.many_to_many);
+      targets.forEach(t=>vis.add(t));
+    }
+  }
+  return Array.from(vis);
+}
+
+// Search match
+function matchesSearch(str){
+  const q = (state.search||"").trim().toLowerCase();
+  if (!q) return true;
+  return String(str||"").toLowerCase().includes(q);
+}
+
+// --- Layout building
+function buildLayout(visibleEntityOrder, visibleModuleOrder){
+  const entityLayout = [];
+  let y = padding.top;
+  for (const name of visibleEntityOrder){
+    const fieldCount = Object.keys((erd.entities[name]||{})).length;
+    const fieldsVisible = state.show.fields && !state.collapsedEntities.has(name);
+    const fieldsHeight = fieldsVisible ? fieldCount * spacing.field : 0;
+    const blockHeight = Math.max(70, fieldsHeight || 70);
+    entityLayout.push({ name, y, fieldCount, fieldsHeight, blockHeight, fieldsVisible });
+    y += blockHeight + padding.between;
+  }
+  const entityBottom = y + padding.top;
+
+  const moduleLayout = [];
+  y = padding.top;
+  for (const mod of visibleModuleOrder){
+    const epCount = state.show.endpoints ? endpointsForModule(mod).length : 0;
+    const epHeight = epCount * spacing.endpoint;
+    const blockHeight = Math.max(70, epHeight || 70);
+    moduleLayout.push({ mod, y, epCount, epHeight, blockHeight });
+    y += blockHeight + padding.between;
+  }
+  const moduleBottom = y + padding.top;
+
+  const h = Math.max(2400, entityBottom, moduleBottom);
+  els.board.style.height = `${h}px`;
+  els.layer.style.width = "4600px";
+  els.layer.style.height = `${h}px`;
+  els.wires.setAttribute("width", "4600");
+  els.wires.setAttribute("height", String(h));
+
+  return { entityLayout, moduleLayout };
+}
+
+// --- Rendering
+function render(){
+  clearLayer();
+
+  const allModules = modulesList();
+  const allEntities = entitiesList();
+
+  const visModules = state.activeModule ? [state.activeModule] : allModules;
+  const visEntities = visibleEntities();
+
+  // Keep a stable order but allow search to filter further by dimming.
+  const { entityLayout, moduleLayout } = buildLayout(visEntities, visModules);
+
+  // Map for quick find
+  const entityEls = new Map();
+  const fieldElsByEntity = new Map();
+  const moduleEls = new Map();
+  const endpointElsByModule = new Map();
+
+  // Entities
+  for (const item of entityLayout){
+    const isMatch = matchesSearch(item.name);
+    const entityEl = createBox(
+      `entity-${item.name}`,
+      item.name,
+      "entity",
+      columnX.entity,
+      item.y,
+      {
+        title: "Click to collapse/expand fields",
+        onClick: ()=>{
+          if (state.collapsedEntities.has(item.name)) state.collapsedEntities.delete(item.name);
+          else state.collapsedEntities.add(item.name);
+          render();
+        },
+        onHover: (on)=> highlightConnected(on, `entity-${item.name}`)
+      }
+    );
+    entityEls.set(item.name, entityEl);
+    if (!isMatch && state.search) entityEl.classList.add("dim");
+  }
+
+  // Fields
+  if (state.show.fields){
+    for (const item of entityLayout){
+      const fieldsVisible = item.fieldsVisible;
+      const list = [];
+      if (!fieldsVisible) continue;
+
+      const fields = Object.entries(erd.entities[item.name]||{});
+      let fy = item.y - 6;
+      fields.forEach(([field, type], idx)=>{
+        const label = `${field}: ${type}`;
+        const id = `field-${item.name}-${idx}`;
+        const isMatch = matchesSearch(label) || matchesSearch(field) || matchesSearch(type) || matchesSearch(item.name);
+        const fEl = createBox(id, label, "field", columnX.field, fy, {
+          title: "Field (hover to highlight wires)",
+          onHover: (on)=> highlightConnected(on, id)
+        });
+        if (!isMatch && state.search) fEl.classList.add("dim");
+        list.push(fEl);
+        fy += spacing.field;
+      });
+      fieldElsByEntity.set(item.name, list);
+    }
+  }
+
+  // Modules
+  for (const item of moduleLayout){
+    const modId = `module-${item.mod}`;
+    const isMatch = matchesSearch(item.mod) || matchesSearch(item.mod.replace("Module",""));
+    const mEl = createBox(
+      modId,
+      item.mod.replace("Module"," Module"),
+      "module",
+      columnX.module,
+      item.y,
+      {
+        onClick: ()=> setActiveModule(item.mod),
+        active: state.activeModule===item.mod,
+        onHover: (on)=> highlightConnected(on, modId)
+      }
+    );
+    if (state.activeModule===item.mod) mEl.classList.add("active");
+    if (!isMatch && state.search) mEl.classList.add("dim");
+    moduleEls.set(item.mod, mEl);
+  }
+
+  // Endpoints
+  if (state.show.endpoints){
+    for (const item of moduleLayout){
+      const eps = endpointsForModule(item.mod);
+      let ey = item.y - 4;
+      const list = [];
+      eps.forEach((ep, idx)=>{
+        const id = `endpoint-${item.mod}-${idx}`;
+        const label = `${ep.method} ${ep.path}`;
+        const isMatch = matchesSearch(label) || matchesSearch(ep.path) || matchesSearch(item.mod);
+        const eEl = createBox(id, label, "endpoint", columnX.endpoint, ey, {
+          title: "Click to copy endpoint",
+          onClick: async ()=>{
+            const copyText = ep.path || label;
+            try{
+              await navigator.clipboard.writeText(copyText);
+              toast(`Copied: ${copyText}`);
+            }catch(e){
+              toast("Copy not available");
+            }
+          },
+          onHover: (on)=> highlightConnected(on, id)
+        });
+        if (!isMatch && state.search) eEl.classList.add("dim");
+        list.push(eEl);
+        ey += spacing.endpoint;
+      });
+      endpointElsByModule.set(item.mod, list);
+    }
+  }
+
+  // Wires:
+  // Module -> primary entity, Module -> endpoints, Entity -> fields, Entity -> related entities
+  const wireIndexByNode = new Map(); // nodeId -> [paths]
+  const indexPath = (nodeId, path)=>{
+    const arr = wireIndexByNode.get(nodeId) || [];
+    arr.push(path);
+    wireIndexByNode.set(nodeId, arr);
+  };
+
+  const isDimMode = !!state.search; // when searching, dim non-matching wires, highlight matches
+  const dimMode = isDimMode ? "dim" : "normal";
+
+  // Module -> entity and Module -> endpoints
+  for (const mod of visModules){
+    const mEl = document.getElementById(`module-${mod}`);
+    if (!mEl) continue;
+    const entityName = primaryEntityForModule(mod);
+    if (entityName && document.getElementById(`entity-${entityName}`)){
+      const p = drawWire(mEl, document.getElementById(`entity-${entityName}`), dimMode);
+      indexPath(`module-${mod}`, p);
+      indexPath(`entity-${entityName}`, p);
+    }
+    if (state.show.endpoints){
+      const eps = endpointElsByModule.get(mod) || [];
+      eps.forEach((eEl)=>{
+        const p = drawWire(mEl, eEl, dimMode);
+        indexPath(`module-${mod}`, p);
+        indexPath(eEl.id, p);
+      });
+    }
+  }
+
+  // Entity -> fields
+  if (state.show.fields){
+    for (const name of visEntities){
+      const eEl = document.getElementById(`entity-${name}`);
+      if (!eEl) continue;
+      const fEls = fieldElsByEntity.get(name) || [];
+      fEls.forEach((fEl)=>{
+        const p = drawWire(eEl, fEl, dimMode);
+        indexPath(eEl.id, p);
+        indexPath(fEl.id, p);
+      });
+    }
+  }
+
+  // Relationships
+  if (state.show.rels){
+    const rels = erd.relationships || {};
+    const visSet = new Set(visEntities);
+    for (const [from, rel] of Object.entries(rels)){
+      if (!visSet.has(from)) continue;
+      const targets = [];
+      if (rel.has_many) targets.push(...rel.has_many);
+      if (rel.belongs_to) targets.push(...(Array.isArray(rel.belongs_to)?rel.belongs_to:[rel.belongs_to]));
+      if (rel.many_to_many) targets.push(...rel.many_to_many);
+      targets.forEach((to)=>{
+        if (!visSet.has(to)) return;
+        const a = document.getElementById(`entity-${from}`);
+        const b = document.getElementById(`entity-${to}`);
+        if (!a || !b) return;
+        const p = drawWire(a, b, dimMode);
+        indexPath(a.id, p);
+        indexPath(b.id, p);
+      });
+    }
+  }
+
+  // Store index for hover highlight
+  window.__wireIndexByNode = wireIndexByNode;
+
+  // Apply dims when search is active: keep only connections of matching nodes highlighted if hovered/clicked.
+  if (state.search){
+    // make non-matching wires dim already; on hover we highlight.
+  }
+}
+
+// Highlight connected wires and nodes on hover
+function highlightConnected(on, nodeId){
+  const idx = window.__wireIndexByNode;
+  if (!idx) return;
+  const paths = idx.get(nodeId) || [];
+  paths.forEach(p=>{
+    if (on) p.classList.add("hl");
+    else p.classList.remove("hl");
+  });
+}
+
+// --- Module rail
+function renderModuleRail(){
+  els.moduleRail.innerHTML = "";
+  const mods = modulesList();
+
+  // "All" chip
+  const allChip = document.createElement("button");
+  allChip.className = "chip active";
+  allChip.textContent = "All Modules";
+  allChip.addEventListener("click", ()=> setActiveModule(null));
+  if (state.activeModule) allChip.classList.remove("active");
+  els.moduleRail.appendChild(allChip);
+
+  mods.forEach(mod=>{
+    const btn = document.createElement("button");
+    btn.className = "chip";
+    if (state.activeModule===mod) btn.classList.add("active");
+    btn.textContent = mod.replace("Module"," Module");
+    btn.addEventListener("click", ()=> setActiveModule(mod));
+    els.moduleRail.appendChild(btn);
+  });
+
+  // quick stats chip
+  const badge = document.createElement("div");
+  badge.className = "chip badge";
+  const e = entitiesList().length;
+  const m = mods.length;
+  const ep = Object.values(erd.apiEndpoints||{}).reduce((a,arr)=>a+(arr?.length||0),0);
+  badge.textContent = `${m} modules • ${e} entities • ${ep} endpoints`;
+  badge.style.marginLeft = "auto";
+  badge.style.cursor = "default";
+  els.moduleRail.appendChild(badge);
+}
+
+// --- Module focus
+function setActiveModule(mod){
+  state.activeModule = mod;
+  renderModuleRail();
+  render();
+  // Smart scroll to module (and reset X)
+  if (mod){
+    const modEl = document.getElementById(`module-${mod}`);
+    if (modEl){
+      els.viewport.scrollLeft = 0;
+      els.viewport.scrollTop = Math.max(0, modEl.offsetTop - 90);
+    }
+  }
+}
+
+// --- Zoom/Pan
+function applyZoom(){
+  els.layer.style.transform = `scale(${state.zoom})`;
+  els.zoomLabel.textContent = `${Math.round(state.zoom*100)}%`;
+}
+function clampZoom(z){ return Math.min(2.2, Math.max(0.45, z)); }
+
+function zoomAt(delta, clientX, clientY){
+  // Keep cursor position stable while zooming
+  const rect = els.viewport.getBoundingClientRect();
+  const x = clientX - rect.left + els.viewport.scrollLeft;
+  const y = clientY - rect.top + els.viewport.scrollTop;
+  const prev = state.zoom;
+  const next = clampZoom(prev * delta);
+  if (next === prev) return;
+
+  // logical coords under current zoom
+  const lx = x / prev;
+  const ly = y / prev;
+  state.zoom = next;
+  applyZoom();
+
+  // new scroll to keep same logical point under cursor
+  els.viewport.scrollLeft = lx * next - (clientX - rect.left);
+  els.viewport.scrollTop  = ly * next - (clientY - rect.top);
+}
+
+function resetView(){
+  state.zoom = 1;
+  applyZoom();
+  els.viewport.scrollLeft = 0;
+  els.viewport.scrollTop = 0;
+}
+
+// Mouse wheel zoom
+els.viewport.addEventListener("wheel", (e)=>{
+  if (!e.ctrlKey && !e.metaKey){
+    // zoom anyway (map behavior) — keep smooth
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 1.08 : 0.92;
+    zoomAt(delta, e.clientX, e.clientY);
+  }
+}, { passive:false });
+
+// Drag to pan
+els.viewport.addEventListener("mousedown", (e)=>{
+  // avoid drag when clicking UI elements
+  if (e.button !== 0) return;
+  state.pan.dragging = true;
+  state.pan.startX = e.clientX;
+  state.pan.startY = e.clientY;
+  state.pan.scrollLeft = els.viewport.scrollLeft;
+  state.pan.scrollTop = els.viewport.scrollTop;
+  els.viewport.style.cursor = "grabbing";
+});
+window.addEventListener("mousemove", (e)=>{
+  if (!state.pan.dragging) return;
+  const dx = e.clientX - state.pan.startX;
+  const dy = e.clientY - state.pan.startY;
+  els.viewport.scrollLeft = state.pan.scrollLeft - dx;
+  els.viewport.scrollTop = state.pan.scrollTop - dy;
+});
+window.addEventListener("mouseup", ()=>{
+  state.pan.dragging = false;
+  els.viewport.style.cursor = "default";
+});
+
+// --- Search
+function setSearch(q){
+  state.search = q || "";
+  render();
+}
+els.search.addEventListener("input", ()=> setSearch(els.search.value));
+els.clearSearchBtn.addEventListener("click", ()=>{
+  els.search.value = "";
+  setSearch("");
+});
+
+// Keyboard shortcuts
+window.addEventListener("keydown", (e)=>{
+  if (e.key === "/"){
+    e.preventDefault();
+    els.search.focus();
+  }
+  if (e.key === "Escape"){
+    els.search.value = "";
+    setSearch("");
+  }
+  if (e.key === "0"){
+    resetView();
+  }
+});
+
+// Toggles
+els.toggleFields.addEventListener("change", ()=>{ state.show.fields = els.toggleFields.checked; render(); });
+els.toggleEndpoints.addEventListener("change", ()=>{ state.show.endpoints = els.toggleEndpoints.checked; render(); });
+els.toggleRels.addEventListener("change", ()=>{ state.show.rels = els.toggleRels.checked; render(); });
+
+// Buttons
+els.showAllBtn.addEventListener("click", ()=> setActiveModule(null));
+els.resetViewBtn.addEventListener("click", ()=> resetView());
+els.zoomInBtn.addEventListener("click", ()=> zoomAt(1.12, window.innerWidth*0.5, 180));
+els.zoomOutBtn.addEventListener("click", ()=> zoomAt(0.90, window.innerWidth*0.5, 180));
+
+els.exportJsonBtn.addEventListener("click", async ()=>{
+  const blob = new Blob([JSON.stringify(erd, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "erd.export.json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+});
+
+// --- Init: load erd.json when possible (works when served via http, not file:// in some browsers)
+async function init(){
+  try{
+    const res = await fetch("erd.json", { cache:"no-store" });
+    if (res.ok){
+      const data = await res.json();
+      if (data && data.entities && data.relationships && data.modules){
+        erd = data;
+      }
+    }
+  }catch(err){
+    // Keep embedded
+  }
+  renderModuleRail();
+  render();
+  applyZoom();
+}
+
+init();
+</script>
+</body>
+</html>
