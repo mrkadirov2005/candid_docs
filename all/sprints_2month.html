@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CandidStudent - 2 Month Acceleration Plan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #00d2ff 0%, #ff6e7f 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 3em; margin-bottom: 15px; font-weight: 800; }
+        .header p { font-size: 1.2em; opacity: 0.95; }
+        .urgency-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .timeline-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            flex: 1;
+            min-width: 150px;
+            border-left: 4px solid #00d2ff;
+        }
+        .timeline-item.milestone {
+            border-left-color: #ff6e7f;
+            background: #fff8f9;
+        }
+        .timeline-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d2ff;
+            margin-bottom: 5px;
+        }
+        .timeline-item.milestone .timeline-value {
+            color: #ff6e7f;
+        }
+        .timeline-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #00d2ff 0%, #ff6e7f 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .sprints-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .sprint-timeline {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .sprint-block {
+            flex: 1;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sprint-block:hover {
+            opacity: 0.9;
+            transform: scaleY(1.05);
+        }
+        .sprint-block.mvp-complete {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .sprint-block.launch {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .sprint-num {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+        .sprint-duration {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+        .sprint-milestone {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.3);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+        .sprint-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+        .sprint-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        .sprint-card:hover {
+            border-color: #00d2ff;
+            box-shadow: 0 8px 20px rgba(0,210,255,0.2);
+        }
+        .sprint-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+        }
+        .goal-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #00d2ff;
+        }
+        .section-title {
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #666;
+        }
+        .task-item:before {
+            content: "▶";
+            position: absolute;
+            left: 0;
+            color: #00d2ff;
+            font-weight: bold;
+        }
+        .team-assignment {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #0d47a1;
+        }
+        .deliverable {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-size: 0.9em;
+            color: #2e7d32;
+            border-left: 3px solid #2e7d32;
+        }
+        .milestone-section {
+            background: linear-gradient(135deg, #fff8f9 0%, #f8f0f5 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #ff6e7f;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #c0392b;
+            text-align: center;
+        }
+        .risks-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid #ffe0b2;
+        }
+        .risks-section h3 {
+            color: #e65100;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        .risk-item {
+            background: #fff8f0;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #ff9800;
+        }
+        .risk-title {
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 5px;
+        }
+        .risk-mitigation {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 2px solid #e0e0e0;
+            color: #666;
+        }
+        .footer strong { color: #1a1a2e; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .sprint-timeline { flex-direction: column; }
+            .sprint-block { min-height: 80px; }
+            .sprint-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CandidStudent Acceleration Plan</h1>
+            <p>MVP in 4 weeks • Full Launch in 8.5 weeks</p>
+            <div class="urgency-badge">⚡ Aggressive 2-Month Timeline with 4-Person Team</div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-value">8.5</div>
+                <div class="timeline-label">Total Weeks</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-value">8</div>
+                <div class="timeline-label">Sprints</div>
+            </div>
+            <div class="timeline-item milestone">
+                <div class="timeline-value">Week 4</div>
+                <div class="timeline-label">MVP Launch 🎯</div>
+            </div>
+            <div class="timeline-item milestone">
+                <div class="timeline-value">Week 8.5</div>
+                <div class="timeline-label">Full Launch 🎉</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-value">4</div>
+                <div class="timeline-label">Team Size</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="document.querySelector('.sprints-container').scrollIntoView({ behavior: 'smooth' })">
+                📋 View Sprints
+            </button>
+            <button onclick="exportData()">💾 Download Plan</button>
+            <button onclick="printPage()">🖨️ Print Timeline</button>
+        </div>
+
+        <div class="sprints-container" id="sprintsContainer">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #1a1a2e; font-size: 2em;">Sprint Timeline</h2>
+            
+            <div class="sprint-timeline" id="timelineBar"></div>
+
+            <div class="sprint-details" id="detailsContainer"></div>
+        </div>
+
+        <div class="risks-section">
+            <h3>⚠️ Critical Risks & Mitigations</h3>
+            <div class="risk-item">
+                <div class="risk-title">Aggressive timeline → Production bugs</div>
+                <div class="risk-mitigation">Mitigation: Intensive testing weeks 6-7, 24/7 monitoring week 8, rapid hotfix protocol</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-title">SQLite won't scale for concurrent users</div>
+                <div class="risk-mitigation">Mitigation: Plan immediate PostgreSQL migration post-launch (sprint 9)</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-title">Reduced feature set vs original roadmap</div>
+                <div class="risk-mitigation">Mitigation: Post-launch roadmap identified, AI/analytics can be added in weeks 9-14</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-title">Team burnout from aggressive schedule</div>
+                <div class="risk-mitigation">Mitigation: Clear daily standups, scope lock after week 6, post-launch break planned</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Team: 2 Backend Engineers + 2 Frontend Engineers</strong></p>
+            <p style="margin-top: 10px;">
+                <strong>Tech Stack:</strong> NestJS + SQLite → PostgreSQL (week 9) | React + Vite | Docker | AWS
+            </p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <strong>Post-Launch Priorities:</strong> PostgreSQL migration → Stripe integration → AI features → Mobile app
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const sprintsData = [
+            {
+                "id": 1,
+                "title": "Backend Foundation + Frontend Setup (PARALLEL)",
+                "duration": "1 week",
+                "phase": "Foundation",
+                "goal": "Get backend API running and React app scaffolded simultaneously",
+                "backend": ["NestJS + SQLite", "Auth module", "DB schema"],
+                "frontend": ["Vite + React Router", "Login/Register pages", "Auth context"],
+                "deliverables": ["POST /auth/register, /auth/login, /auth/me working", "Frontend login/register working"],
+                "team": "Dev 1,2 (Backend) | Dev 3,4 (Frontend)"
+            },
+            {
+                "id": 2,
+                "title": "Projects + Student Dashboard (PARALLEL)",
+                "duration": "1 week",
+                "phase": "Core Features",
+                "goal": "Complete project CRUD and student dashboard - MVP's core",
+                "backend": ["Students module", "Projects CRUD + skills", "Skills module", "Universities + Teachers basic"],
+                "frontend": ["Dashboard layout", "Project CRUD UI", "Skills selector", "Profile page"],
+                "deliverables": ["All CRUD endpoints working", "Dashboard loads and manages projects"],
+                "team": "Dev 1,2 (Backend) | Dev 3,4 (Frontend)"
+            },
+            {
+                "id": 3,
+                "title": "Verification Flow + University Admin (PARALLEL)",
+                "duration": "1 week",
+                "phase": "Core Features",
+                "goal": "Complete university verification workflow - MVP differentiator",
+                "backend": ["Verification requests CRUD", "Badge system", "Approval/rejection logic"],
+                "frontend": ["Verification request UI", "University admin dashboard", "Teacher review interface"],
+                "deliverables": ["Complete verification workflow end-to-end", "Status displays correctly"],
+                "team": "Dev 1,2 (Backend) | Dev 3,4 (Frontend)",
+                "milestone": true
+            },
+            {
+                "id": 4,
+                "title": "GitHub Integration + Public Portfolio (MVP LAUNCH)",
+                "duration": "1 week",
+                "phase": "MVP Complete",
+                "goal": "Add GitHub OAuth and public portfolio. MVP complete and launchable.",
+                "backend": ["GitHub OAuth", "Public portfolio endpoint", "Basic student search"],
+                "frontend": ["GitHub connect button", "Public portfolio pages", "Student search UI"],
+                "deliverables": ["GitHub OAuth working", "Public portfolios viewable", "Search working"],
+                "team": "Dev 1,2 (Backend) | Dev 3,4 (Frontend)",
+                "milestone": "MVP COMPLETE - Ready for beta"
+            },
+            {
+                "id": 5,
+                "title": "Messaging + Employers + Vacancies",
+                "duration": "1 week",
+                "phase": "Extended Features",
+                "goal": "Add messaging, employer management, and job vacancies",
+                "backend": ["Messaging CRUD", "Employers module", "Vacancies CRUD", "Point system basics"],
+                "frontend": ["Messaging UI", "Employer dashboard", "Vacancy posting/viewing"],
+                "deliverables": ["Users can message", "Employers can post jobs", "Points tracked"],
+                "team": "Dev 1,2 (Backend) | Dev 3,4 (Frontend)"
+            },
+            {
+                "id": 6,
+                "title": "Testing + Bug Fixes + Deployment Prep",
+                "duration": "1 week",
+                "phase": "Quality & Deployment",
+                "goal": "Comprehensive testing and prepare for launch",
+                "testing": ["E2E workflow testing", "Integration testing", "Cross-browser testing", "Performance testing"],
+                "devops": ["Docker setup", "Environment config", "Deployment scripts"],
+                "frontend": ["Bug fixes", "UI polish", "Performance optimization"],
+                "deliverables": ["All critical bugs fixed", "Docker image ready", "Deployment scripts working"],
+                "team": "Dev 1 (Testing) | Dev 2 (DevOps) | Dev 3,4 (Frontend fixes)"
+            },
+            {
+                "id": 7,
+                "title": "Production Deployment + Security",
+                "duration": "0.5 week",
+                "phase": "Launch",
+                "goal": "Deploy to production and apply security hardening",
+                "security": ["HTTPS/TLS", "CORS hardening", "Rate limiting", "SQL injection prevention"],
+                "devops": ["AWS deployment", "Database setup", "Monitoring", "Backup config"],
+                "deliverables": ["App running on production at HTTPS", "Monitoring live", "Backups automated"],
+                "team": "Dev 1 (Security) | Dev 2 (DevOps) | Dev 3,4 (Frontend prod build)",
+                "milestone": "PRODUCTION LIVE"
+            },
+            {
+                "id": 8,
+                "title": "Beta Testing + Launch",
+                "duration": "0.5 week",
+                "phase": "Public Launch",
+                "goal": "Beta testing, final fixes, official launch",
+                "testing": ["Beta user feedback", "Last-minute bug fixes", "Load testing"],
+                "launch": ["Launch announcement", "Social media", "Email to users", "Analytics setup"],
+                "deliverables": ["Zero critical issues", "First 100 users onboarded", "Public URL live"],
+                "team": "All devs",
+                "milestone": "PUBLIC LAUNCH ✅"
+            }
+        ];
+
+        function renderTimeline() {
+            const timeline = document.getElementById('timelineBar');
+            timeline.innerHTML = sprintsData.map(s => `
+                <div class="sprint-block ${s.milestone ? (s.id <= 4 ? 'mvp-complete' : 'launch') : ''}" 
+                     onclick="document.getElementById('sprint-${s.id}').scrollIntoView({ behavior: 'smooth' })">
+                    ${s.milestone ? `<div class="sprint-milestone">MILESTONE</div>` : ''}
+                    <div class="sprint-num">Sprint ${s.id}</div>
+                    <div class="sprint-duration">${s.duration}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderDetails() {
+            const details = document.getElementById('detailsContainer');
+            details.innerHTML = sprintsData.map(s => `
+                <div class="sprint-card" id="sprint-${s.id}">
+                    <div class="sprint-title">Sprint ${s.id}: ${s.title}</div>
+                    
+                    <div class="goal-section">
+                        <strong>🎯 Goal:</strong> ${s.goal}
+                    </div>
+
+                    ${s.team ? `<div class="team-assignment">👥 Team: ${s.team}</div>` : ''}
+
+                    ${s.backend ? `
+                        <div class="section-title">Backend Tasks</div>
+                        <ul class="task-list">
+                            ${s.backend.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${s.frontend ? `
+                        <div class="section-title">Frontend Tasks</div>
+                        <ul class="task-list">
+                            ${s.frontend.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${s.testing ? `
+                        <div class="section-title">Testing Tasks</div>
+                        <ul class="task-list">
+                            ${s.testing.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${s.devops ? `
+                        <div class="section-title">DevOps Tasks</div>
+                        <ul class="task-list">
+                            ${s.devops.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${s.security ? `
+                        <div class="section-title">Security Tasks</div>
+                        <ul class="task-list">
+                            ${s.security.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    ${s.launch ? `
+                        <div class="section-title">Launch Tasks</div>
+                        <ul class="task-list">
+                            ${s.launch.map(t => `<li class="task-item">${t}</li>`).join('')}
+                        </ul>
+                    ` : ''}
+
+                    <div class="section-title">📦 Deliverables</div>
+                    ${s.deliverables.map(d => `<div class="deliverable">✅ ${d}</div>`).join('')}
+
+                    ${s.milestone ? `<div class="milestone-section">🎯 MILESTONE: ${s.milestone}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function exportData() {
+            const data = JSON.stringify(sprintsData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'candid_2month_plan.json';
+            a.click();
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        // Initialize
+        renderTimeline();
+        renderDetails();
+    </script>
+</body>
+</html>

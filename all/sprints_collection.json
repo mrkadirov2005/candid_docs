@@ -1,0 +1,802 @@
+{
+  "project": "CandidStudent",
+  "description": "University-integrated platform for student portfolio generation, project verification, and talent discovery",
+  "techStack": {
+    "backend": ["NestJS", "Drizzle ORM", "PostgreSQL"],
+    "frontend": ["React", "Vite", "React Query"],
+    "architecture": {
+      "frontend": "feature-based",
+      "backend": "modular monolith"
+    }
+  },
+  "sprints": [
+    {
+      "id": 1,
+      "title": "Sprint 1 — Backend Foundation Setup (NestJS Modular Architecture + Health Endpoint)",
+      "duration": "2 weeks",
+      "phase": "Foundation",
+      "priority": "critical",
+      "sprintGoal": "Set up a production-ready NestJS backend with a clean modular architecture, configuration, and a working /health endpoint so frontend + backend integration can start immediately.",
+      "scope": {
+        "willDeliver": [
+          "NestJS project initialized and runnable",
+          "Modular architecture baseline (AppModule + feature modules)",
+          "Config management using environment variables",
+          "Global validation + error handling baseline",
+          "Health module with GET /health returning service status",
+          "Swagger (optional but recommended) for quick API visibility",
+          "Basic scripts for dev/start/build/test"
+        ]
+      },
+      "deliverables": [
+        "Repository with working NestJS server",
+        "Modular folder structure (src/modules/health, src/modules/config, etc.)",
+        "/health endpoint reachable locally and returns JSON",
+        ".env.example added",
+        "README updated with setup/run instructions",
+        "package.json with all necessary scripts"
+      ],
+      "userStories": [
+        {
+          "id": "US-1",
+          "story": "As a developer, I can run the backend locally and confirm it's alive via /health.",
+          "acceptanceCriteria": [
+            "npm install completes successfully",
+            "npm run start:dev runs without errors",
+            "GET /health responds with 200 status",
+            "Response contains {status: 'ok', service: 'api', timestamp}"
+          ]
+        },
+        {
+          "id": "US-2",
+          "story": "As a developer, I can add new modules (users, auth, etc.) using a consistent pattern.",
+          "acceptanceCriteria": [
+            "Modules folder structure exists and is documented",
+            "Example module demonstrates the pattern",
+            "README includes module generation guide"
+          ]
+        },
+        {
+          "id": "US-3",
+          "story": "As a developer, I can manage config via env variables without hardcoding secrets.",
+          "acceptanceCriteria": [
+            ".env file is git-ignored",
+            ".env.example exists with all required keys",
+            "ConfigService provides typed access to config",
+            "All secrets are retrieved from environment"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "BACK-1.1",
+          "title": "Initialize NestJS project with proper structure",
+          "description": "Create new NestJS app, set up folder structure for modular architecture",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Run 'nest new candid-backend'",
+            "Create src/modules directory",
+            "Create src/common directory (filters, pipes, interceptors, utils)",
+            "Create src/config directory",
+            "Create src/database directory",
+            "Verify app.module.ts exists",
+            "Add .gitignore for node_modules, .env, dist"
+          ]
+        },
+        {
+          "id": "BACK-1.2",
+          "title": "Setup environment configuration with @nestjs/config",
+          "description": "Configure environment variables, add .env and .env.example files",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Install @nestjs/config package",
+            "Create src/config/configuration.ts",
+            "Create ConfigModule and import in AppModule",
+            "Enable ConfigModule.forRoot({ isGlobal: true })",
+            "Create .env file (local only, git-ignored)",
+            "Create .env.example with all required keys",
+            "Add NODE_ENV, PORT, DATABASE_URL, GITHUB_OAUTH_ID, GITHUB_OAUTH_SECRET keys"
+          ]
+        },
+        {
+          "id": "BACK-1.3",
+          "title": "Add global validation pipeline",
+          "description": "Setup ValidationPipe globally for request validation",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Install class-validator and class-transformer",
+            "Add ValidationPipe to AppModule providers or main.ts",
+            "Configure with whitelist: true, forbidNonWhitelisted: true, transform: true",
+            "Type validation will be done per endpoint using DTOs",
+            "Test with a simple POST request with invalid data"
+          ]
+        },
+        {
+          "id": "BACK-1.4",
+          "title": "Create HealthModule with /health endpoint",
+          "description": "Implement health check endpoint for service verification",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Create src/modules/health/ directory",
+            "Create HealthController with GET /health",
+            "Create HealthService",
+            "Create HealthModule",
+            "Response: { status: 'ok', service: 'api', timestamp: ISO timestamp, version: '0.1.0' }",
+            "Import HealthModule into AppModule",
+            "Test endpoint manually with curl or Postman"
+          ]
+        },
+        {
+          "id": "BACK-1.5",
+          "title": "Setup Swagger/OpenAPI documentation",
+          "description": "Add Swagger for API documentation and testing",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Install @nestjs/swagger and swagger-ui-express",
+            "Setup SwaggerModule in main.ts",
+            "Document /health endpoint with decorator",
+            "Enable /api/docs endpoint",
+            "Add basic info: CandidStudent API, version 0.1.0, description"
+          ]
+        },
+        {
+          "id": "BACK-1.6",
+          "title": "Add CORS configuration",
+          "description": "Enable CORS for frontend development and integration",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Add enableCors() in main.ts",
+            "Configure allowed origins from env variable",
+            "Allow credentials if needed",
+            "Test CORS headers with OPTIONS request"
+          ]
+        },
+        {
+          "id": "BACK-1.7",
+          "title": "Setup npm scripts for development",
+          "description": "Add useful scripts for development workflow",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "npm run start:dev (watch mode)",
+            "npm run start:prod (production mode)",
+            "npm run build (compile TypeScript)",
+            "npm run test (unit tests)",
+            "npm run lint (ESLint)",
+            "npm run format (Prettier)"
+          ]
+        },
+        {
+          "id": "BACK-1.8",
+          "title": "Create Docker setup for local development",
+          "description": "Setup Docker and docker-compose for isolated environment",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Create Dockerfile for NestJS app (dev stage)",
+            "Create docker-compose.yml with app service",
+            "Test docker build",
+            "Add docker-compose instructions to README",
+            "Verify app runs in container"
+          ]
+        },
+        {
+          "id": "BACK-1.9",
+          "title": "Update README with setup and run instructions",
+          "description": "Document how to setup, run, and develop the backend",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Add Project Overview section",
+            "Add Tech Stack section",
+            "Add Prerequisites (Node, Docker, etc.)",
+            "Add Installation steps (git clone, npm install)",
+            "Add Running locally (npm run start:dev)",
+            "Add Running with Docker",
+            "Document /health endpoint",
+            "Add API Documentation (Swagger /api/docs)",
+            "Add module architecture explanation",
+            "Add Contributing guidelines"
+          ]
+        }
+      ],
+      "acceptanceCriteria": [
+        "npm install completes without errors",
+        "npm run start:dev runs successfully and app listens on configured PORT",
+        "GET /health responds with 200 status and JSON body",
+        "Response body includes: status, service, timestamp",
+        "Code is organized in modules (clearly visible folder structure)",
+        "All config comes from .env (no hardcoded values in code)",
+        "Global ValidationPipe is active",
+        "Swagger docs available at /api/docs",
+        "README includes all setup and usage instructions",
+        "Docker image builds and container runs without errors"
+      ],
+      "outOfScope": [
+        "Authentication (JWT, sessions)",
+        "Database connection + migrations",
+        "Business feature modules (users, projects, etc.)",
+        "Rate limiting, caching, queues",
+        "Email notifications",
+        "External API integrations (GitHub, Stripe)"
+      ],
+      "exampleResponse": {
+        "endpoint": "GET /health",
+        "statusCode": 200,
+        "body": {
+          "status": "ok",
+          "service": "api",
+          "timestamp": "2026-02-28T10:00:00.000Z",
+          "version": "0.1.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Sprint 2 — Database Layer Setup (PostgreSQL + Drizzle ORM + Migrations)",
+      "duration": "2 weeks",
+      "phase": "Foundation",
+      "priority": "critical",
+      "sprintGoal": "Establish a production-grade database layer with Drizzle ORM, schema versioning via migrations, and documented data models ready for feature development.",
+      "scope": {
+        "willDeliver": [
+          "PostgreSQL connection configured and tested",
+          "Drizzle ORM setup with TypeScript types",
+          "Migration system working (create, run, rollback)",
+          "Initial schema created (users, universities tables)",
+          "Database module for dependency injection",
+          "Database connection pooling configured",
+          "Dev/test database seeding scripts"
+        ]
+      },
+      "deliverables": [
+        "drizzle.config.ts configured and working",
+        "Database connection established from ConfigService",
+        "src/database/schema.ts with base entities",
+        "src/database/migrations/ folder with migration files",
+        "Database module injectable throughout app",
+        ".env.example updated with DATABASE_URL",
+        "README updated with database setup instructions",
+        "Seed script for local development",
+        "TypeScript schema types generated from Drizzle",
+        "Database diagram or entity relationship document"
+      ],
+      "userStories": [
+        {
+          "id": "US-4",
+          "story": "As a developer, I can create, run, and rollback database migrations without losing data.",
+          "acceptanceCriteria": [
+            "drizzle migrate command works",
+            "New migration files are created with timestamps",
+            "Migrations can be run and rolled back safely",
+            "Schema changes are tracked in migrations folder",
+            "Previous migrations remain intact"
+          ]
+        },
+        {
+          "id": "US-5",
+          "story": "As a backend developer, I can query the database using type-safe Drizzle ORM syntax.",
+          "acceptanceCriteria": [
+            "Drizzle client is injectable in services",
+            "Type hints work for all table queries",
+            "Relations between tables are properly typed",
+            "Query examples in a sample service"
+          ]
+        },
+        {
+          "id": "US-6",
+          "story": "As a QA engineer, I can seed the database with test data for local testing.",
+          "acceptanceCriteria": [
+            "Seed script exists and runs without errors",
+            "Script populates users, universities, teachers, students",
+            "Script can be run multiple times safely (idempotent)",
+            "README includes seed command"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "BACK-2.1",
+          "title": "Install and configure Drizzle ORM",
+          "description": "Setup Drizzle ORM as the database access layer",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Install drizzle-orm, drizzle-kit, postgres packages",
+            "Create src/database/ directory",
+            "Create drizzle.config.ts with PostgreSQL dialect",
+            "Configure schema directory path",
+            "Configure migrations directory path",
+            "Add migration commands to package.json scripts",
+            "Test Drizzle CLI commands"
+          ]
+        },
+        {
+          "id": "BACK-2.2",
+          "title": "Setup PostgreSQL connection with pooling",
+          "description": "Configure database connection with connection pooling for performance",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Create src/database/connection.ts",
+            "Use postgres client with pool configuration",
+            "Read connection string from ConfigService",
+            "Add connection error handling and logging",
+            "Test connection on app startup",
+            "Add DATABASE_URL to .env and .env.example",
+            "Configure pool size (min: 2, max: 10)"
+          ]
+        },
+        {
+          "id": "BACK-2.3",
+          "title": "Define initial schema with Drizzle",
+          "description": "Create schema file with core entities",
+          "assignee": "Backend Lead",
+          "storyPoints": 5,
+          "subtasks": [
+            "Create src/database/schema.ts",
+            "Define users table (id, email, password_hash, name, role, created_at, updated_at)",
+            "Define universities table (id, name, location, admin_id, created_at, updated_at)",
+            "Define university_admins table (id, name, email, university_id, password_hash, is_active)",
+            "Define teachers table (id, name, email, university_id, password_hash, is_verified, is_active)",
+            "Define students table (id, name, email, university_id, password_hash, is_verified, is_active)",
+            "Define employers table (id, name, email, company, password_hash, is_active)",
+            "Add foreign key relationships between tables",
+            "Add indexes: email (unique), university_id, is_active",
+            "Add timestamps to all tables with defaults"
+          ]
+        },
+        {
+          "id": "BACK-2.4",
+          "title": "Create and run initial migration",
+          "description": "Generate and execute the first database migration",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Run 'drizzle-kit generate:postgres' to create migration",
+            "Review generated migration SQL for accuracy",
+            "Run 'drizzle-kit migrate' to apply migration to database",
+            "Verify tables exist in PostgreSQL with correct schema",
+            "Test rollback capability with test data",
+            "Commit migration files to git"
+          ]
+        },
+        {
+          "id": "BACK-2.5",
+          "title": "Create DatabaseModule for NestJS dependency injection",
+          "description": "Setup database service and module for app-wide access",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Create src/modules/database/ directory",
+            "Create DatabaseService wrapping Drizzle client",
+            "Create DatabaseModule (export DatabaseService)",
+            "Add DatabaseModule to AppModule imports",
+            "Services can now inject DatabaseService",
+            "Export all schema types from database module for use in services",
+            "Add database connection logging"
+          ]
+        },
+        {
+          "id": "BACK-2.6",
+          "title": "Create database seed script",
+          "description": "Script to populate local database with sample data",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Create src/scripts/seed.ts",
+            "Insert 2-3 sample universities",
+            "Insert 1 sample admin user for each university",
+            "Insert 3-5 sample teachers for each university",
+            "Insert 10-20 sample students across universities",
+            "Insert 3-5 sample employers",
+            "Make script idempotent (check before insert or use upsert)",
+            "Hash passwords with Argon2",
+            "Add 'npm run seed' command to package.json",
+            "Document seed script usage in README",
+            "Make seed script async-safe"
+          ]
+        },
+        {
+          "id": "BACK-2.7",
+          "title": "Update README with database setup instructions",
+          "description": "Document database setup and migration process",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Add Database section to README",
+            "Document PostgreSQL installation requirements",
+            "Add steps: npm run migrate, npm run seed",
+            "Document migration workflow (create, run, rollback)",
+            "Add schema documentation or entity diagram",
+            "Add connection troubleshooting tips",
+            "Document how to reset database for development"
+          ]
+        }
+      ],
+      "acceptanceCriteria": [
+        "PostgreSQL is running and accessible via DATABASE_URL",
+        "Drizzle ORM is installed and configured correctly",
+        "drizzle.config.ts exists and is valid",
+        "Initial migration runs without errors",
+        "All tables exist in database with correct schema and indexes",
+        "DatabaseModule is injectable in NestJS services",
+        "npm run seed populates test data successfully",
+        "Connection pooling is configured and working",
+        "All queries are type-safe with Drizzle types",
+        "Migration files are tracked in git (src/database/migrations/)",
+        "Rollback of migrations works without data loss"
+      ],
+      "outOfScope": [
+        "Advanced query optimization (will be done based on usage patterns)",
+        "Read replicas or database sharding",
+        "Automated backup/restore tools",
+        "Query performance monitoring and caching (covered in later sprints)",
+        "Database replication setup"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Sprint 3 — Authentication Module (Registration, Login, JWT, RBAC Guards)",
+      "duration": "2 weeks",
+      "phase": "Foundation",
+      "priority": "critical",
+      "sprintGoal": "Implement complete authentication system with registration, login, JWT tokens, and role-based access control (RBAC) guards so protected endpoints can be built in subsequent sprints.",
+      "scope": {
+        "willDeliver": [
+          "User registration endpoint (email, password, role selection)",
+          "User login endpoint with JWT token issuance",
+          "JWT token validation and refresh mechanism",
+          "Role-based access control (RBAC) guards",
+          "@Roles() and @Public() decorators for route protection",
+          "Password hashing with Argon2",
+          "Error handling for auth failures",
+          "GET /auth/me endpoint for current user context"
+        ]
+      },
+      "deliverables": [
+        "AuthModule with registration, login, and token endpoints",
+        "JwtStrategy for token validation",
+        "RolesGuard for RBAC enforcement",
+        "@Roles() decorator for endpoint protection",
+        "@Public() decorator for public endpoints",
+        "@CurrentUser() decorator for accessing user context",
+        "Argon2 password hashing implemented",
+        ".env variables: JWT_SECRET, JWT_EXPIRATION",
+        "Auth DTOs with Zod validation",
+        "Updated README with auth flow documentation",
+        "Example: protected /me endpoint returning user profile",
+        "Comprehensive unit and integration tests"
+      ],
+      "userStories": [
+        {
+          "id": "US-7",
+          "story": "As a user, I can register with email, password, and role (student/teacher/admin/employer).",
+          "acceptanceCriteria": [
+            "POST /auth/register accepts { email, password, name, role }",
+            "Password is hashed with Argon2 before storage",
+            "Response is { id, email, name, role, createdAt } (no password)",
+            "Duplicate emails are rejected with 409 Conflict",
+            "Invalid email format is rejected with 400",
+            "Weak passwords are rejected",
+            "All required fields are validated"
+          ]
+        },
+        {
+          "id": "US-8",
+          "story": "As a user, I can login with email and password and receive a JWT token.",
+          "acceptanceCriteria": [
+            "POST /auth/login accepts { email, password }",
+            "Response is { accessToken, expiresIn, user: {...} }",
+            "Invalid credentials return 401 Unauthorized",
+            "Token can be used in Authorization header for authenticated requests",
+            "Token expires after configured duration",
+            "Expired tokens return 401"
+          ]
+        },
+        {
+          "id": "US-9",
+          "story": "As a developer, I can protect routes by role using @Roles(Role.STUDENT) decorator.",
+          "acceptanceCriteria": [
+            "@Roles decorator exists and is easy to use",
+            "Requests without proper role get 403 Forbidden",
+            "Multiple roles can be specified: @Roles(Role.STUDENT, Role.TEACHER)",
+            "Role checking is enforced at request level",
+            "Unauthenticated requests get 401 before role check"
+          ]
+        },
+        {
+          "id": "US-10",
+          "story": "As an authenticated user, I can fetch my profile via GET /auth/me.",
+          "acceptanceCriteria": [
+            "GET /auth/me returns current user profile",
+            "Unauthenticated requests return 401",
+            "Response includes id, email, name, role, createdAt",
+            "Token must be valid (not expired)"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "BACK-3.1",
+          "title": "Install authentication dependencies",
+          "description": "Add required packages for JWT and password hashing",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Install @nestjs/jwt",
+            "Install @nestjs/passport",
+            "Install passport-jwt",
+            "Install argon2",
+            "Install zod (schema validation)",
+            "Verify versions align with NestJS and Node version"
+          ]
+        },
+        {
+          "id": "BACK-3.2",
+          "title": "Create Auth DTOs with Zod validation",
+          "description": "Define request/response schemas for auth endpoints",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Create src/modules/auth/dtos/register.dto.ts",
+            "Define Zod schema: email, password, name, role",
+            "Add password strength validation (min 8 chars, uppercase, number, symbol)",
+            "Create src/modules/auth/dtos/login.dto.ts",
+            "Define Zod schema: email, password",
+            "Create auth response DTOs (token response, user response)",
+            "Export all DTOs from dtos/index.ts",
+            "Add validation error messages"
+          ]
+        },
+        {
+          "id": "BACK-3.3",
+          "title": "Create AuthService with password hashing and JWT logic",
+          "description": "Core authentication business logic",
+          "assignee": "Backend Lead",
+          "storyPoints": 5,
+          "subtasks": [
+            "Create src/modules/auth/auth.service.ts",
+            "Implement register() method with duplicate email check",
+            "Implement login() method with credential validation",
+            "Implement hashPassword() using Argon2 (salt rounds: 10)",
+            "Implement validatePassword() to verify hashed password",
+            "Implement generateAccessToken() with JWT",
+            "Handle email uniqueness validation against database",
+            "Error handling: duplicate email (409), invalid credentials (401)",
+            "Return user object without password field",
+            "Add timeout for password hashing operations"
+          ]
+        },
+        {
+          "id": "BACK-3.4",
+          "title": "Create AuthController with register and login endpoints",
+          "description": "HTTP endpoints for authentication",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Create src/modules/auth/auth.controller.ts",
+            "POST /auth/register endpoint with RegisterDto",
+            "POST /auth/login endpoint with LoginDto",
+            "GET /auth/me endpoint (protected with @UseGuards(JwtAuthGuard))",
+            "Add proper validation with ValidationPipe",
+            "Add @Public() decorator to register and login endpoints",
+            "Add error handling with proper HTTP status codes",
+            "Return standardized response format",
+            "Add Swagger decorators for API documentation"
+          ]
+        },
+        {
+          "id": "BACK-3.5",
+          "title": "Setup JWT strategy for token validation",
+          "description": "Configure Passport JWT strategy",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Create src/modules/auth/strategies/jwt.strategy.ts",
+            "Extend PassportStrategy from 'passport-jwt'",
+            "Extract token from Authorization header (Bearer <token>)",
+            "Verify token with JWT_SECRET from config",
+            "Return user payload on successful verification",
+            "Handle expired tokens (throw UnauthorizedException)",
+            "Handle invalid token signatures",
+            "Test with valid and expired tokens"
+          ]
+        },
+        {
+          "id": "BACK-3.6",
+          "title": "Create RolesGuard for RBAC enforcement",
+          "description": "Guard to check user roles on protected endpoints",
+          "assignee": "Backend Lead",
+          "storyPoints": 2,
+          "subtasks": [
+            "Create src/modules/auth/guards/roles.guard.ts",
+            "Get required roles from @Roles() decorator metadata",
+            "Check if user role matches one of the required roles",
+            "Return 403 Forbidden if role doesn't match",
+            "Allow requests with @Public() decorator to bypass role check",
+            "Handle unauthenticated requests (401 before role check)",
+            "Test with multiple roles and single role"
+          ]
+        },
+        {
+          "id": "BACK-3.7",
+          "title": "Create @Roles(), @Public(), and @CurrentUser() decorators",
+          "description": "Easy-to-use decorators for route protection and context",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Create src/modules/auth/decorators/roles.decorator.ts",
+            "Create src/modules/auth/decorators/public.decorator.ts",
+            "Create src/modules/auth/decorators/current-user.decorator.ts",
+            "Export all from auth/decorators/index.ts",
+            "Add JSDoc comments for each decorator",
+            "Test decorators on example endpoints"
+          ]
+        },
+        {
+          "id": "BACK-3.8",
+          "title": "Setup JwtModule and RolesGuard in AuthModule",
+          "description": "Configure JWT and role-based access in NestJS",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Create src/modules/auth/auth.module.ts",
+            "Use JwtModule.register() with secret and expiration options",
+            "Read JWT_SECRET and JWT_EXPIRATION from ConfigService",
+            "Create JwtAuthGuard extending AuthGuard('jwt')",
+            "Configure RolesGuard as APP_GUARD for global enforcement",
+            "Import JwtStrategy",
+            "Export AuthModule from providers array"
+          ]
+        },
+        {
+          "id": "BACK-3.9",
+          "title": "Add comprehensive test coverage for auth module",
+          "description": "Unit tests for auth service and controllers",
+          "assignee": "Backend Lead",
+          "storyPoints": 3,
+          "subtasks": [
+            "Test registration with valid data",
+            "Test registration with duplicate email (409)",
+            "Test registration with invalid email format",
+            "Test registration with weak password",
+            "Test login with correct credentials",
+            "Test login with wrong password (401)",
+            "Test login with non-existent email (401)",
+            "Test password hashing (verify hash can't be reversed)",
+            "Test token generation and validation",
+            "Test token expiration",
+            "Test @Roles guard with valid and invalid roles"
+          ]
+        },
+        {
+          "id": "BACK-3.10",
+          "title": "Update README with authentication guide",
+          "description": "Document auth flow and usage",
+          "assignee": "Backend Lead",
+          "storyPoints": 1,
+          "subtasks": [
+            "Add Authentication section to README",
+            "Document flow: register → login → use token",
+            "Show example curl requests for /auth/register",
+            "Show example curl requests for /auth/login",
+            "Document Authorization header format (Bearer <token>)",
+            "Document @Roles() decorator usage with examples",
+            "Document @Public() decorator for public endpoints",
+            "Add security notes (HTTPS in production, token rotation)",
+            "Show JWT token structure (decoded example)"
+          ]
+        }
+      ],
+      "acceptanceCriteria": [
+        "POST /auth/register works with valid data and returns user without password",
+        "POST /auth/login returns JWT access token on success",
+        "GET /auth/me returns 401 Unauthorized without token",
+        "GET /auth/me returns authenticated user profile with valid token",
+        "Routes with @Roles(Role.STUDENT) reject non-student users with 403",
+        "Passwords are hashed with Argon2 (never stored or returned in plain text)",
+        "Duplicate emails are rejected with 409 Conflict",
+        "JWT tokens expire after configured duration (e.g., 1 hour)",
+        "RolesGuard is applied globally to all controllers",
+        "All auth endpoints are documented in Swagger (/api/docs)",
+        "Unit tests have >80% coverage for auth module",
+        "Auth module can be used immediately for protecting other endpoints"
+      ],
+      "outOfScope": [
+        "OAuth/Social login (GitHub, Google)",
+        "Multi-factor authentication (MFA)",
+        "Password reset/recovery flow",
+        "Session-based authentication (stateless JWT only)",
+        "Rate limiting on auth endpoints (covered in later sprint)",
+        "Token refresh/rotation (basic JWT only for MVP)"
+      ],
+      "exampleResponses": {
+        "register": {
+          "endpoint": "POST /auth/register",
+          "request": {
+            "email": "student@university.edu",
+            "password": "SecurePass123!",
+            "name": "John Doe",
+            "role": "STUDENT"
+          },
+          "response": {
+            "statusCode": 201,
+            "body": {
+              "id": "uuid-1234-5678-90ab",
+              "email": "student@university.edu",
+              "name": "John Doe",
+              "role": "STUDENT",
+              "createdAt": "2026-02-28T10:00:00.000Z"
+            }
+          }
+        },
+        "login": {
+          "endpoint": "POST /auth/login",
+          "request": {
+            "email": "student@university.edu",
+            "password": "SecurePass123!"
+          },
+          "response": {
+            "statusCode": 200,
+            "body": {
+              "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1dWlkLTEyMzQiLCJlbWFpbCI6InN0dWRlbnRALi4uIiwicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE2NDAwMDAwMDAsImV4cCI6MTY0MDAwMzYwMH0...",
+              "expiresIn": 3600,
+              "user": {
+                "id": "uuid-1234-5678-90ab",
+                "email": "student@university.edu",
+                "name": "John Doe",
+                "role": "STUDENT"
+              }
+            }
+          }
+        },
+        "me": {
+          "endpoint": "GET /auth/me",
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "response": {
+            "statusCode": 200,
+            "body": {
+              "id": "uuid-1234-5678-90ab",
+              "email": "student@university.edu",
+              "name": "John Doe",
+              "role": "STUDENT",
+              "createdAt": "2026-02-28T10:00:00.000Z"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "totalSprints": 26,
+    "estimatedDuration": "26 weeks (6 months) for MVP + extended features",
+    "mvcScope": "Sprints 1-14 (14 weeks) → auth, user mgmt, projects, verification, portfolio, search",
+    "extendedScope": "Sprints 15-25 → GitHub, employer features, AI, analytics, deployment, security, launch",
+    "teamSuggestion": {
+      "backend": "2-3 senior engineers",
+      "frontend": "2 engineers",
+      "devops": "1 engineer",
+      "productManager": "1",
+      "designer": "1 (UI/UX)"
+    },
+    "notes": [
+      "All story points are estimates; adjust based on team capacity and experience",
+      "Sprints can be run in parallel (e.g., frontend Sprint 10 while backend Sprint 6)",
+      "Backend Sprints 1-9 form the foundation; frontend can start on Sprint 10",
+      "Sprints 19-25 are supporting tasks (testing, DevOps, security, launch)",
+      "AI features (Sprint 22) are optional; can be added post-launch for revenue",
+      "Payment integration (Stripe) in Sprint 24 is required for revenue generation",
+      "Each sprint includes detailed user stories, tasks, and acceptance criteria",
+      "Definition of Done: code review, tests passing, documented, merged to main"
+    ]
+  }
+}

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CandidStudent - Sprints Planning Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #3b82f6;
+      --primary-light: #dbeafe;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+      color: white;
+      padding: 30px 0;
+      margin-bottom: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 16px;
+    }
+
+    .header-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .meta-label {
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-group label {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    select,
+    input {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    select:focus,
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    button {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #1e40af;
+    }
+
+    button.secondary {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    button.secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .stat-card.critical {
+      border-left-color: var(--danger);
+    }
+
+    .stat-card.high {
+      border-left-color: var(--warning);
+    }
+
+    .stat-card.medium {
+      border-left-color: #6366f1;
+    }
+
+    .stat-card.low {
+      border-left-color: var(--success);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .sprints-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .sprint-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.2s;
+    }
+
+    .sprint-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .sprint-header {
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, #f0f9ff 100%);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      user-select: none;
+    }
+
+    .sprint-header:hover {
+      background: linear-gradient(135deg, #bfdbfe 0%, #e0f2fe 100%);
+    }
+
+    .sprint-header-left {
+      flex: 1;
+    }
+
+    .sprint-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .sprint-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+    }
+
+    .sprint-goal {
+      background: var(--primary-light);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .scope-list, .deliverables-list, .criteria-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .scope-list li, .deliverables-list li, .criteria-list li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .scope-list li:before, .deliverables-list li:before, .criteria-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .user-story {
+      background: var(--card);
+      border-left: 4px solid #8b5cf6;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .story-text {
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .story-criteria {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 12px;
+    }
+
+    .story-criteria li {
+      padding: 2px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge.critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge.high {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.medium {
+      background: #e0e7ff;
+      color: #312e81;
+    }
+
+    .badge.low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge.phase {
+      background: var(--primary-light);
+      color: #1e40af;
+    }
+
+    .toggle-icon {
+      font-size: 20px;
+      margin-left: 12px;
+      transition: transform 0.2s;
+    }
+
+    .sprint-card.expanded .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .sprint-tasks {
+      display: none;
+      padding: 16px;
+      background: #f9fafb;
+    }
+
+    .sprint-card.expanded .sprint-tasks {
+      display: block;
+    }
+
+    .tasks-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task-item {
+      background: var(--card);
+      border-left: 4px solid var(--primary);
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .task-id {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .task-title {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .task-description {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .task-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .subtasks {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .subtasks-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .subtask-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 12px;
+      padding: 4px 0;
+      list-style: disc;
+    }
+
+    pre {
+      background: #0b0e11;
+      color: #e2e8f0;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+
+    .summary-section {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+      border: 1px solid var(--border);
+    }
+
+    .summary-section h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .summary-list li {
+      padding: 6px 0;
+      margin-left: 20px;
+    }
+
+    .export-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .export-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 24px;
+      }
+
+      .header-meta {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-group {
+        flex-direction: column;
+      }
+
+      .sprint-header {
+        flex-direction: column;
+      }
+
+      .toggle-icon {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 CandidStudent - Sprint Planning Dashboard</h1>
+      <p>University-integrated portfolio, verification & talent discovery platform</p>
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">Tech Stack</span>
+          <span class="meta-value">NestJS, Drizzle, React</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Architecture</span>
+          <span class="meta-value">Modular Backend, Feature-based Frontend</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Total Sprints</span>
+          <span class="meta-value">26 sprints</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Estimated Duration</span>
+          <span class="meta-value">~6 months (MVP + extended)</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="filter-group">
+        <label for="phaseFilter">Phase:</label>
+        <select id="phaseFilter">
+          <option value="">All Phases</option>
+          <option value="Foundation">Foundation</option>
+          <option value="Core Features">Core Features</option>
+          <option value="Frontend Foundation">Frontend Foundation</option>
+          <option value="Frontend Core">Frontend Core</option>
+          <option value="Frontend Extended">Frontend Extended</option>
+          <option value="Extended Features">Extended Features</option>
+          <option value="DevOps & Documentation">DevOps & Documentation</option>
+          <option value="Quality & Polish">Quality & Polish</option>
+          <option value="DevOps & Deployment">DevOps & Deployment</option>
+          <option value="Security & Compliance">Security & Compliance</option>
+          <option value="Monetization & Growth">Monetization & Growth</option>
+          <option value="Launch">Launch</option>
+          <option value="Post-Launch">Post-Launch</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="priorityFilter">Priority:</label>
+        <select id="priorityFilter">
+          <option value="">All Priorities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <input type="text" id="searchInput" placeholder="Search by sprint name or task..." />
+      </div>
+
+      <button onclick="resetFilters()">Reset Filters</button>
+      <button class="secondary" onclick="expandAll()">Expand All</button>
+      <button class="secondary" onclick="collapseAll()">Collapse All</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card critical">
+        <div class="stat-label">Critical Sprints</div>
+        <div class="stat-value" id="criticalCount">0</div>
+      </div>
+      <div class="stat-card high">
+        <div class="stat-label">High Priority</div>
+        <div class="stat-value" id="highCount">0</div>
+      </div>
+      <div class="stat-card medium">
+        <div class="stat-label">Medium Priority</div>
+        <div class="stat-value" id="mediumCount">0</div>
+      </div>
+      <div class="stat-card low">
+        <div class="stat-label">Low Priority</div>
+        <div class="stat-value" id="lowCount">0</div>
+      </div>
+    </div>
+
+    <div id="sprintsContainer" class="sprints-grid"></div>
+
+    <div class="summary-section">
+      <h2>📋 Project Summary</h2>
+      <div class="summary-list">
+        <li><strong>Total Sprints:</strong> 26 (Foundation → Launch → Post-Launch)</li>
+        <li><strong>MVP Scope:</strong> Sprints 1-14 (14 weeks) covering auth, user management, projects, verification, portfolio, and search</li>
+        <li><strong>Extended Scope:</strong> Sprints 15-25 including GitHub integration, employer features, AI, analytics, security, and deployment</li>
+        <li><strong>Estimated MVP Timeline:</strong> 14 weeks (3.5 months)</li>
+        <li><strong>Full Product Timeline:</strong> 26 weeks (6 months)</li>
+        <li><strong>Recommended Team Size:</strong> 2-3 Backend Engineers, 2 Frontend Engineers, 1 DevOps, 1 Product Manager, 1 Designer</li>
+      </div>
+
+      <h3 style="margin-top: 20px; margin-bottom: 12px;">Key Phases:</h3>
+      <div class="summary-list">
+        <li><strong>Sprints 1-2:</strong> Backend Foundation (NestJS, Drizzle, PostgreSQL, Auth, RBAC)</li>
+        <li><strong>Sprints 3-8:</strong> Core Features (Skills, Projects, Verification, GitHub, Search, Portfolio)</li>
+        <li><strong>Sprints 9-18:</strong> Frontend Development & Employer Features</li>
+        <li><strong>Sprints 19-21:</strong> Testing, Deployment, Infrastructure</li>
+        <li><strong>Sprints 22-25:</strong> Advanced Features, Security, Launch Prep</li>
+        <li><strong>Sprint 26+:</strong> Ongoing monitoring, iteration, and growth</li>
+      </div>
+
+      <div class="export-section">
+        <h3>📤 Export for JIRA/GitHub</h3>
+        <div class="export-buttons">
+          <button onclick="downloadJSON()">📥 Download JSON</button>
+          <button onclick="copyToClipboard()">📋 Copy JSON to Clipboard</button>
+          <button onclick="exportAsCSV()">📊 Export as CSV</button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+          💡 Use the JSON file to import sprints into JIRA via the "Bulk Change" feature, or use it as a template for GitHub Issues.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load sprints from JSON (embedded inline for simplicity)
+    const sprintsData = {
+      "project": "CandidStudent",
+      "sprints": [
+        {
+          "id": 1,
+          "name": "Sprint 1: Backend Foundation & Auth",
+          "duration": "2 weeks",
+          "phase": "Foundation",
+          "priority": "critical",
+          "tasks": [
+            {
+              "id": "BACK-1",
+              "title": "Set up NestJS project, Drizzle ORM, PostgreSQL",
+              "description": "Initialize project, configure Drizzle migrations, database connection",
+              "assignee": "Backend Lead",
+              "storyPoints": 5,
+              "subtasks": ["Create NestJS project structure", "Configure Drizzle ORM", "Set up PostgreSQL connection"]
+            },
+            {
+              "id": "BACK-2",
+              "title": "AuthModule: Register, Login, JWT, Guards",
+              "description": "Implement authentication with Argon2 hashing, JWT tokens, RBAC guards",
+              "assignee": "Backend Lead",
+              "storyPoints": 8,
+              "subtasks": ["Create User base entity", "Implement password hashing (Argon2)", "POST /auth/register endpoint"]
+            }
+          ]
+        }
+      ]
+    };
+
+    // Load actual data from external JSON
+    let allSprints = [];
+
+    async function loadSprints() {
+      try {
+        const response = await fetch('./sprints_collection.json');
+        const data = await response.json();
+        allSprints = data.sprints;
+        updateStats();
+        renderSprints();
+      } catch (error) {
+        console.error('Error loading sprints:', error);
+        // Fallback: use sample data
+        renderEmptyState();
+      }
+    }
+
+    function updateStats() {
+      const counts = {
+        critical: allSprints.filter(s => s.priority === 'critical').length,
+        high: allSprints.filter(s => s.priority === 'high').length,
+        medium: allSprints.filter(s => s.priority === 'medium').length,
+        low: allSprints.filter(s => s.priority === 'low').length
+      };
+
+      document.getElementById('criticalCount').textContent = counts.critical;
+      document.getElementById('highCount').textContent = counts.high;
+      document.getElementById('mediumCount').textContent = counts.medium;
+      document.getElementById('lowCount').textContent = counts.low;
+    }
+
+    function renderSprints() {
+      const container = document.getElementById('sprintsContainer');
+      const phase = document.getElementById('phaseFilter').value;
+      const priority = document.getElementById('priorityFilter').value;
+      const search = document.getElementById('searchInput').value.toLowerCase();
+
+      let filtered = allSprints.filter(sprint => {
+        const matchesPhase = !phase || sprint.phase === phase;
+        const matchesPriority = !priority || sprint.priority === priority;
+        const matchesSearch = !search || 
+          sprint.title.toLowerCase().includes(search) ||
+          sprint.name?.toLowerCase().includes(search) ||
+          sprint.sprintGoal?.toLowerCase().includes(search) ||
+          sprint.tasks.some(task => 
+            task.title.toLowerCase().includes(search) || 
+            task.id.toLowerCase().includes(search)
+          ) ||
+          (sprint.userStories && sprint.userStories.some(us => 
+            us.story.toLowerCase().includes(search)
+          ));
+        return matchesPhase && matchesPriority && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No sprints match your filters</p></div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(sprint => `
+        <div class="sprint-card" data-sprint-id="${sprint.id}">
+          <div class="sprint-header" onclick="toggleSprint(${sprint.id})">
+            <div class="sprint-header-left">
+              <div class="sprint-title">${sprint.title || sprint.name}</div>
+              <div class="sprint-meta">
+                <span class="badge phase">${sprint.phase}</span>
+                <span class="badge ${sprint.priority}">${sprint.priority.toUpperCase()}</span>
+                <span style="color: var(--text-muted);">⏱️ ${sprint.duration}</span>
+                <span style="color: var(--text-muted);">📋 ${sprint.tasks.length} tasks</span>
+              </div>
+            </div>
+            <div class="toggle-icon">▼</div>
+          </div>
+          <div class="sprint-tasks">
+            ${sprint.sprintGoal ? `<div class="sprint-goal"><strong>Sprint Goal:</strong> ${sprint.sprintGoal}</div>` : ''}
+            
+            ${sprint.scope ? `
+              <div>
+                <div class="section-title">📌 Scope (What Will Be Delivered)</div>
+                <ul class="scope-list">
+                  ${(sprint.scope.willDeliver || []).map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            ${sprint.deliverables && sprint.deliverables.length > 0 ? `
+              <div>
+                <div class="section-title">📦 Deliverables</div>
+                <ul class="deliverables-list">
+                  ${sprint.deliverables.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            ${sprint.userStories && sprint.userStories.length > 0 ? `
+              <div>
+                <div class="section-title">👤 User Stories</div>
+                ${sprint.userStories.map(story => `
+                  <div class="user-story">
+                    <div class="story-text">[${story.id}] ${story.story}</div>
+                    ${story.acceptanceCriteria && story.acceptanceCriteria.length > 0 ? `
+                      <div class="story-criteria">
+                        <strong>Acceptance Criteria:</strong>
+                        <ul>
+                          ${story.acceptanceCriteria.map(c => `<li>✓ ${c}</li>`).join('')}
+                        </ul>
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <div>
+              <div class="section-title">✅ Acceptance Criteria</div>
+              <ul class="criteria-list">
+                ${sprint.acceptanceCriteria.map(item => `<li>${item}</li>`).join('')}
+              </ul>
+            </div>
+
+            ${sprint.outOfScope && sprint.outOfScope.length > 0 ? `
+              <div>
+                <div class="section-title">❌ Out of Scope</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                  ${sprint.outOfScope.map(item => `<li style="padding: 4px 0; padding-left: 20px; position: relative;"><span style="position: absolute; left: 0;">✗</span>${item}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+
+            <div>
+              <div class="section-title">📋 Tasks & Subtasks</div>
+              <div class="tasks-list">
+                ${sprint.tasks.map(task => `
+                  <div class="task-item">
+                    <div class="task-id">${task.id}</div>
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-meta">
+                      <div class="task-meta-item">👤 ${task.assignee}</div>
+                      <div class="task-meta-item">⭐ ${task.storyPoints} pts</div>
+                    </div>
+                    ${task.subtasks && task.subtasks.length > 0 ? `
+                      <div class="subtasks">
+                        <div class="subtasks-label">Subtasks:</div>
+                        <ul style="list-style: none; margin: 0; padding: 0;">
+                          ${task.subtasks.map(sub => `<li class="subtask-item">${sub}</li>`).join('')}
+                        </ul>
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            ${sprint.exampleResponse ? `
+              <div>
+                <div class="section-title">📤 Example Response</div>
+                <pre>${JSON.stringify(sprint.exampleResponse, null, 2)}</pre>
+              </div>
+            ` : ''}
+
+            ${sprint.exampleResponses ? `
+              <div>
+                <div class="section-title">📤 Example Responses</div>
+                ${Object.values(sprint.exampleResponses).map(resp => `
+                  <pre>${JSON.stringify(resp, null, 2)}</pre>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleSprint(sprintId) {
+      const card = document.querySelector(`[data-sprint-id="${sprintId}"]`);
+      card.classList.toggle('expanded');
+    }
+
+    function expandAll() {
+      document.querySelectorAll('.sprint-card').forEach(card => card.classList.add('expanded'));
+    }
+
+    function collapseAll() {
+      document.querySelectorAll('.sprint-card').forEach(card => card.classList.remove('expanded'));
+    }
+
+    function resetFilters() {
+      document.getElementById('phaseFilter').value = '';
+      document.getElementById('priorityFilter').value = '';
+      document.getElementById('searchInput').value = '';
+      collapseAll();
+      renderSprints();
+    }
+
+    function downloadJSON() {
+      const dataStr = JSON.stringify(allSprints, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'candid_sprints.json';
+      link.click();
+    }
+
+    function copyToClipboard() {
+      const dataStr = JSON.stringify(allSprints, null, 2);
+      navigator.clipboard.writeText(dataStr).then(() => {
+        alert('✅ Sprints copied to clipboard!');
+      });
+    }
+
+    function exportAsCSV() {
+      let csv = 'Sprint ID,Sprint Name,Phase,Priority,Duration,Sprint Goal,Task ID,Task Title,Assignee,Story Points,Subtasks\n';
+      
+      allSprints.forEach(sprint => {
+        const sprintName = sprint.title || sprint.name;
+        const goal = (sprint.sprintGoal || '').replace(/"/g, '""');
+        
+        if (sprint.tasks && sprint.tasks.length > 0) {
+          sprint.tasks.forEach((task, idx) => {
+            const subtasks = (task.subtasks || []).join('; ').replace(/"/g, '""');
+            csv += `${sprint.id},"${sprintName}","${sprint.phase}","${sprint.priority}","${sprint.duration}","${goal}","${task.id}","${task.title}","${task.assignee}",${task.storyPoints},"${subtasks}"\n`;
+          });
+        } else {
+          csv += `${sprint.id},"${sprintName}","${sprint.phase}","${sprint.priority}","${sprint.duration}","${goal}",,,,
+`;
+        }
+      });
+
+      const dataBlob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'candid_sprints_detailed.csv';
+      link.click();
+    }
+
+    function renderEmptyState() {
+      document.getElementById('sprintsContainer').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📂</div>
+          <p>Sprints data not found. Make sure sprints_collection.json is in the same directory.</p>
+          <p style="font-size: 12px; margin-top: 8px; color: #999;">Check browser console for details.</p>
+        </div>
+      `;
+    }
+
+    // Filter handlers
+    document.getElementById('phaseFilter').addEventListener('change', renderSprints);
+    document.getElementById('priorityFilter').addEventListener('change', renderSprints);
+    document.getElementById('searchInput').addEventListener('input', renderSprints);
+
+    // Load on start
+    window.addEventListener('load', loadSprints);
+  </script>
+</body>
+</html>

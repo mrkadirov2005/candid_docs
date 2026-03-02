@@ -1,0 +1,490 @@
+{
+  "project": "CandidStudent",
+  "timeline": "2 months (8-9 weeks)",
+  "teamSize": 4,
+  "mvpDate": "Week 4",
+  "launchDate": "Week 8-9",
+  "strategy": "Parallel backend + frontend development with aggressive scope focus",
+  "sprints": [
+    {
+      "id": 1,
+      "title": "Sprint 1 — Backend Foundation + Frontend Setup (PARALLEL)",
+      "phase": "Foundation",
+      "duration": "1 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "backend": ["Dev 1", "Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Get backend API running and React app scaffolded. Parallel work to save time.",
+      "scope": {
+        "backend": [
+          "NestJS setup + SQLite (not PostgreSQL - faster)",
+          "Health endpoint",
+          "Auth module (register/login/JWT)",
+          "Database schema (users, students, projects, verification)",
+          "Seed script"
+        ],
+        "frontend": [
+          "Vite + React setup",
+          "React Router + layouts",
+          "Login/register pages",
+          "Simple auth context"
+        ]
+      },
+      "deliverables": [
+        "Backend: /health, POST /auth/register, POST /auth/login, GET /auth/me working",
+        "Frontend: Login/Register pages working, can call backend"
+      ],
+      "userStories": [
+        {
+          "id": "US-1",
+          "story": "As user, I can register and login",
+          "acceptanceCriteria": ["Register works", "Login returns token", "Token stored", "Can access /auth/me"]
+        }
+      ],
+      "tasks": [
+        {"id": "BACK-1.1", "title": "NestJS + SQLite + Health", "sp": 4},
+        {"id": "BACK-1.2", "title": "Auth module complete", "sp": 8},
+        {"id": "BACK-1.3", "title": "DB schema + migration", "sp": 4},
+        {"id": "FRONT-1.1", "title": "Vite + React Router setup", "sp": 3},
+        {"id": "FRONT-1.2", "title": "Auth pages (register/login)", "sp": 5},
+        {"id": "FRONT-1.3", "title": "Auth context + API client", "sp": 4}
+      ],
+      "acceptanceCriteria": [
+        "npm run start:dev works backend",
+        "npm run dev works frontend",
+        "Can register and login end-to-end",
+        "Token stored in localStorage",
+        "API client interceptor working"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Sprint 2 — Projects + Student Dashboard (PARALLEL)",
+      "phase": "Core Features",
+      "duration": "1 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "backend": ["Dev 1", "Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Complete project CRUD and basic student dashboard. Build MVP's core feature.",
+      "scope": {
+        "backend": [
+          "Students module (profile CRUD)",
+          "Projects module (CRUD + skills relationship)",
+          "Skills module (basic CRUD)",
+          "University module (simple list)",
+          "Teachers module (basic list)"
+        ],
+        "frontend": [
+          "Student dashboard",
+          "Project list with CRUD",
+          "Create/edit project form",
+          "Skills selector",
+          "Profile page"
+        ]
+      },
+      "deliverables": [
+        "Backend: All CRUD endpoints for students, projects, skills, universities, teachers",
+        "Frontend: Working dashboard with project management"
+      ],
+      "tasks": [
+        {"id": "BACK-2.1", "title": "Students module", "sp": 5},
+        {"id": "BACK-2.2", "title": "Projects module + skills relationship", "sp": 7},
+        {"id": "BACK-2.3", "title": "Skills module", "sp": 4},
+        {"id": "BACK-2.4", "title": "Universities + Teachers basic", "sp": 3},
+        {"id": "FRONT-2.1", "title": "Dashboard layout", "sp": 4},
+        {"id": "FRONT-2.2", "title": "Project CRUD UI", "sp": 6},
+        {"id": "FRONT-2.3", "title": "Skills selector + profile", "sp": 4}
+      ],
+      "acceptanceCriteria": [
+        "All CRUD endpoints working",
+        "Dashboard loads student data",
+        "Can create/edit/delete projects",
+        "Can assign skills to projects",
+        "API integration complete"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Sprint 3 — Verification Flow + University Admin (PARALLEL)",
+      "phase": "Core Features",
+      "duration": "1 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "backend": ["Dev 1", "Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Complete university verification workflow. This is core MVP differentiator.",
+      "scope": {
+        "backend": [
+          "Verification requests CRUD",
+          "Badge system (poor/medium/satisfactory)",
+          "Request approval/rejection",
+          "University scope enforcement",
+          "Project verification status"
+        ],
+        "frontend": [
+          "Verification request button",
+          "Verification status display",
+          "University admin dashboard",
+          "Teacher review interface",
+          "Approve/reject with badge selector"
+        ]
+      },
+      "deliverables": [
+        "Backend: Complete verification workflow end-to-end",
+        "Frontend: Student can request, teacher can approve/reject, status shows on project"
+      ],
+      "tasks": [
+        {"id": "BACK-3.1", "title": "Verification requests CRUD", "sp": 5},
+        {"id": "BACK-3.2", "title": "Approval/rejection logic + badges", "sp": 6},
+        {"id": "BACK-3.3", "title": "University admin endpoints", "sp": 4},
+        {"id": "FRONT-3.1", "title": "Request verification UI + status", "sp": 4},
+        {"id": "FRONT-3.2", "title": "University admin dashboard", "sp": 5},
+        {"id": "FRONT-3.3", "title": "Teacher review interface", "sp": 5}
+      ],
+      "acceptanceCriteria": [
+        "Students can request verification",
+        "Teachers can approve/reject",
+        "Badges assigned correctly",
+        "Status shows on UI",
+        "University scope enforced",
+        "End-to-end workflow tested"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Sprint 4 — GitHub Integration + Public Portfolio (MVP LAUNCH READY)",
+      "phase": "Core Features",
+      "duration": "1 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "backend": ["Dev 1", "Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Add GitHub OAuth and public portfolio. MVP complete and launchable.",
+      "scope": {
+        "backend": [
+          "GitHub OAuth endpoints",
+          "Token secure storage", 
+          "GET /public/portfolio/:username endpoint",
+          "Search students by skills (basic)"
+        ],
+        "frontend": [
+          "GitHub connect button",
+          "Public portfolio view",
+          "Basic student search",
+          "Share portfolio URL"
+        ]
+      },
+      "deliverables": [
+        "GitHub OAuth working",
+        "Public portfolio pages viewable",
+        "Basic student search working",
+        "MVP ready for soft launch"
+      ],
+      "tasks": [
+        {"id": "BACK-4.1", "title": "GitHub OAuth complete", "sp": 6},
+        {"id": "BACK-4.2", "title": "Public portfolio endpoint", "sp": 4},
+        {"id": "BACK-4.3", "title": "Student search basic", "sp": 3},
+        {"id": "FRONT-4.1", "title": "GitHub connect UI", "sp": 3},
+        {"id": "FRONT-4.2", "title": "Public portfolio pages", "sp": 5},
+        {"id": "FRONT-4.3", "title": "Student search UI", "sp": 3}
+      ],
+      "acceptanceCriteria": [
+        "GitHub OAuth works end-to-end",
+        "Public portfolio accessible via URL",
+        "Student search filters by skills",
+        "All MVP features stable",
+        "No critical bugs"
+      ],
+      "milestone": "MVP COMPLETE - Ready for beta launch"
+    },
+    {
+      "id": 5,
+      "title": "Sprint 5 — Messaging + Employers + Vacancies",
+      "phase": "Extended Features",
+      "duration": "1 week",
+      "priority": "high",
+      "teamAssignment": {
+        "backend": ["Dev 1", "Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Add messaging, employer management, and job vacancies.",
+      "scope": {
+        "backend": [
+          "Messaging CRUD (simple implementation)",
+          "Employers module",
+          "Vacancies CRUD",
+          "Point system (basic)",
+          "Wishlist/checklist"
+        ],
+        "frontend": [
+          "Messaging UI (conversations + threads)",
+          "Employer dashboard",
+          "Vacancies posting and viewing",
+          "Student wishlist viewing"
+        ]
+      },
+      "deliverables": [
+        "Messaging working between users",
+        "Employer dashboard functional",
+        "Job posting working",
+        "Point system tracking"
+      ],
+      "tasks": [
+        {"id": "BACK-5.1", "title": "Messaging module", "sp": 5},
+        {"id": "BACK-5.2", "title": "Employers + vacancies + points", "sp": 7},
+        {"id": "FRONT-5.1", "title": "Messaging UI", "sp": 5},
+        {"id": "FRONT-5.2", "title": "Employer dashboard", "sp": 6}
+      ],
+      "acceptanceCriteria": [
+        "Users can message each other",
+        "Employers can post jobs",
+        "Wishlists work",
+        "Points tracked"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Sprint 6 — Testing + Bug Fixes + Deployment Prep",
+      "phase": "Quality & Deployment",
+      "duration": "1 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "testing": ["Dev 1"],
+        "devops": ["Dev 2"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Comprehensive testing, critical bug fixes, and prepare for launch.",
+      "scope": {
+        "testing": [
+          "End-to-end workflow testing",
+          "API integration testing",
+          "Error scenario testing",
+          "Cross-browser testing",
+          "Performance testing"
+        ],
+        "devops": [
+          "Docker setup",
+          "Environment config",
+          "Database backup",
+          "Deployment script",
+          "Production checklist"
+        ],
+        "frontend": [
+          "bug fixes from testing",
+          "UI/UX improvements",
+          "Performance optimization",
+          "Help documentation"
+        ]
+      },
+      "deliverables": [
+        "All critical bugs fixed",
+        "Dockerized application",
+        "Deployment scripts ready",
+        "Staging environment working"
+      ],
+      "tasks": [
+        {"id": "TEST-6.1", "title": "Complete E2E testing", "sp": 6},
+        {"id": "DEVOPS-6.1", "title": "Docker + deployment", "sp": 6},
+        {"id": "BUG-6.1", "title": "Fix critical bugs", "sp": 5},
+        {"id": "FRONT-6.1", "title": "UI polish + docs", "sp": 4}
+      ],
+      "acceptanceCriteria": [
+        "All MVP workflows tested",
+        "No critical bugs remain",
+        "Docker image builds successfully",
+        "Deployment script works",
+        "Staging env is production-like"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Sprint 7 — Production Deployment + Security Hardening",
+      "phase": "Launch Prep",
+      "duration": "0.5 week",
+      "priority": "critical",
+      "teamAssignment": {
+        "devops": ["Dev 2"],
+        "backend": ["Dev 1"],
+        "frontend": ["Dev 3", "Dev 4"]
+      },
+      "sprintGoal": "Deploy to production and apply essential security hardening.",
+      "scope": {
+        "security": [
+          "HTTPS/TLS setup",
+          "CORS hardening",
+          "Rate limiting",
+          "SQL injection prevention (verify ORM usage)",
+          "XSS prevention"
+        ],
+        "deployment": [
+          "Deploy to AWS/Cloud",
+          "Database replication",
+          "Monitoring setup",
+          "Backup verification",
+          "DNS configuration"
+        ],
+        "frontend": [
+          "Production build optimization",
+          "Analytics integration",
+          "Error tracking (Sentry)"
+        ]
+      },
+      "deliverables": [
+        "Application running in production",
+        "HTTPS enabled",
+        "Monitoring and alerts active",
+        "Security baseline met"
+      ],
+      "tasks": [
+        {"id": "DEVOPS-7.1", "title": "AWS deployment + DNS", "sp": 5},
+        {"id": "SEC-7.1", "title": "Security hardening", "sp": 4},
+        {"id": "MONITOR-7.1", "title": "Monitoring + alerts", "sp": 3},
+        {"id": "FRONT-7.1", "title": "Prod optimization", "sp": 2}
+      ],
+      "acceptanceCriteria": [
+        "App accessible via public URL over HTTPS",
+        "Monitoring active with alerts",
+        "Database backed up hourly",
+        "Security scanning passed",
+        "No downtime launch"
+      ],
+      "milestone": "PRODUCTION LIVE"
+    },
+    {
+      "id": 8,
+      "title": "Sprint 8 — Beta Testing + Final Polish + Launch",
+      "phase": "Launch",
+      "duration": "0.5 week",
+      "priority": "high",
+      "teamAssignment": {
+        "all": ["All devs"]
+      },
+      "sprintGoal": "Beta user testing, final bug fixes, and official launch.",
+      "scope": {
+        "testing": [
+          "Beta user feedback collection",
+          "Last-minute bug fixes",
+          "Performance monitoring",
+          "Load testing"
+        ],
+        "marketing": [
+          "Launch announcement",
+          "Social media posts",
+          "Email to beta users",
+          "Blog post"
+        ]
+      },
+      "deliverables": [
+        "Zero critical issues",
+        "Launch announcement published",
+        "First 100 users onboarded",
+        "Analytics dashboard live"
+      ],
+      "tasks": [
+        {"id": "BETA-8.1", "title": "Beta testing + fixes", "sp": 4},
+        {"id": "LAUNCH-8.1", "title": "Official launch", "sp": 2},
+        {"id": "MARKETING-8.1", "title": "Launch announcement", "sp": 2}
+      ],
+      "acceptanceCriteria": [
+        "No critical bugs from beta",
+        "Launch announcement live",
+        "First beta users active",
+        "Monitoring shows healthy system",
+        "Team celebration 🎉"
+      ],
+      "milestone": "PUBLIC LAUNCH COMPLETE"
+    }
+  ],
+  "summary": {
+    "totalWeeks": 8.5,
+    "totalSprints": 8,
+    "teamSize": 4,
+    "mvpCompleteWeek": 4,
+    "publicLaunchWeek": 8.5,
+    "keyFeaturesMVP": [
+      "User auth",
+      "Student profiles + projects",
+      "Skills management",
+      "University verification system",
+      "Public portfolios",
+      "Basic student search"
+    ],
+    "featuresAddedPostMVP": [
+      "GitHub OAuth",
+      "Messaging",
+      "Employers + Job posting",
+      "Point system",
+      "Advanced search with filters"
+    ],
+    "whatWasRemoved": [
+      "AI features (can add later)",
+      "Advanced analytics",
+      "Kubernetes (Docker only)",
+      "Payment integration (hardcoded pricing for now)",
+      "Mobile app (web responsive only)",
+      "Complex caching (Redis) - use in-memory"
+    ],
+    "technicalShortcuts": [
+      "SQLite instead of PostgreSQL (faster for dev, can migrate later)",
+      "Simple JWT expiry (no refresh token logic)",
+      "No WebSockets (polling for messaging/notifications)",
+      "Email sending: console.log only",
+      "File uploads: mock S3 URLs",
+      "No rate limiting initially (add after launch if needed)"
+    ]
+  },
+  "teamWorkplan": {
+    "dev1": {
+      "weeks": "1-6",
+      "focus": "Backend APIs (auth, projects, verification)",
+      "week7": "Security hardening",
+      "week8": "Production monitoring"
+    },
+    "dev2": {
+      "weeks": "1-5",
+      "focus": "Backend databases, skills, employers modules",
+      "week6": "DevOps (Docker, deployment)",
+      "week7": "AWS deployment",
+      "week8": "Production ops"
+    },
+    "dev3": {
+      "weeks": "1-8",
+      "focus": "Frontend UI (pages, forms, dashboards)",
+      "adjustments": "Can help with API integration"
+    },
+    "dev4": {
+      "weeks": "1-8",
+      "focus": "Frontend integration (API calls, state mgmt, testing)",
+      "adjustments": "Can help with UI components"
+    }
+  },
+  "risks": [
+    {
+      "risk": "Aggressive timeline may cause bugs in production",
+      "mitigation": "Thorough testing in weeks 6-7, monitoring in week 8, rapid hotfix process"
+    },
+    {
+      "risk": "SQLite not suitable for concurrent users",
+      "mitigation": "Migrate to PostgreSQL in sprint 9 post-launch"
+    },
+    {
+      "risk": "Missing advanced features",
+      "mitigation": "Plan roadmap for post-launch iterations"
+    },
+    {
+      "risk": "Team burnout from aggressive schedule",
+      "mitigation": "Clear priorities, daily standups, after-launch break"
+    }
+  ],
+  "postLaunchRoadmap": {
+    "week9-10": "PostgreSQL migration, refactoring",
+    "week11-14": "AI features, advanced search, Stripe integration",
+    "week15+": "Mobile app, advanced analytics, scaling infrastructure"
+  }
+}
